@@ -1,29 +1,42 @@
 "use client";
 
 import { useInterwovenKit } from "@initia/interwovenkit-react";
-import { useBalance } from "wagmi";
-import { TESTNET_EVM_CHAIN_ID } from "@/lib/config";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { WalletIcon, ArrowRightIcon } from "lucide-react";
+import { ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-export function UserBalanceCard() {
-  const { isConnected, hexAddress } = useInterwovenKit();
+const INITIA_REST = "https://rest.testnet.initia.xyz";
 
-  const { data: initBalance, isLoading } = useBalance({
-    address: hexAddress as `0x${string}`,
-    chainId: TESTNET_EVM_CHAIN_ID,
-    query: { enabled: isConnected && !!hexAddress, refetchInterval: 10_000 },
+async function fetchInitBalance(cosmosAddress: string): Promise<number> {
+  const res = await fetch(
+    `${INITIA_REST}/cosmos/bank/v1beta1/balances/${cosmosAddress}`,
+    { cache: "no-store" }
+  );
+  if (!res.ok) return 0;
+  const data = await res.json();
+  const uinit = (data.balances ?? []).find((b: { denom: string }) => b.denom === "uinit");
+  return uinit ? parseInt(uinit.amount) / 1_000_000 : 0;
+}
+
+export function UserBalanceCard() {
+  const { isConnected, hexAddress, address: cosmosAddress } = useInterwovenKit() as {
+    isConnected: boolean;
+    hexAddress: string;
+    address: string;
+  };
+
+  const { data: balance, isLoading } = useQuery({
+    queryKey: ["initBalance", cosmosAddress],
+    queryFn: () => fetchInitBalance(cosmosAddress),
+    enabled: isConnected && !!cosmosAddress,
+    refetchInterval: 15_000,
   });
 
   if (!isConnected) return null;
-
-  const balance = initBalance
-    ? parseFloat(initBalance.formatted).toFixed(4)
-    : null;
 
   return (
     <Card>
@@ -33,7 +46,7 @@ export function UserBalanceCard() {
             <CardTitle className="flex items-center gap-2">
               Your Wallet
               <Badge variant="secondary" className="font-mono text-xs">
-                {hexAddress.slice(0, 6)}…{hexAddress.slice(-4)}
+                {hexAddress?.slice(0, 6)}…{hexAddress?.slice(-4)}
               </Badge>
             </CardTitle>
             <CardDescription>Live balance on Initia testnet</CardDescription>
@@ -49,17 +62,16 @@ export function UserBalanceCard() {
             <span className="text-xs text-muted-foreground">INIT balance</span>
             {isLoading ? (
               <Skeleton className="h-6 w-24" />
-            ) : balance !== null ? (
-              <span className="font-mono font-semibold text-lg tabular-nums">
-                {balance} <span className="text-sm text-muted-foreground font-normal">INIT</span>
-              </span>
             ) : (
-              <span className="text-sm text-muted-foreground">—</span>
+              <span className="font-mono font-semibold text-lg tabular-nums">
+                {balance?.toFixed(4) ?? "0.0000"}{" "}
+                <span className="text-sm text-muted-foreground font-normal">INIT</span>
+              </span>
             )}
           </div>
           <div className="flex flex-col gap-0.5">
             <span className="text-xs text-muted-foreground">Network</span>
-            <span className="text-sm font-medium">Initia testnet</span>
+            <span className="text-sm font-medium">initiation-2</span>
           </div>
         </div>
       </CardContent>
