@@ -12,7 +12,8 @@ export interface Session {
   startedAt: number;
   finalizedAt?: number;
   steps: Step[];
-  verdict?: "BUY" | "SKIP";
+  strategy?: string;
+  verdict?: "BUY" | "SELL" | "SKIP";
   confidence?: number;
   token?: string | null;
   reasoning?: string;
@@ -29,10 +30,52 @@ export interface AttestationsResult {
   count: number;
 }
 
+export interface Holding {
+  amount: number;
+  avgEntryPrice: number;
+  costUsd: number;
+  currentPrice: number;
+  currentUsd: number;
+  unrealisedUsd: number;
+  unrealisedPct: number;
+}
+
+export interface TradeRecord {
+  sessionId: string;
+  timestamp: number;
+  side: "BUY" | "SELL";
+  token: string;
+  amountUsd: number;
+  price: number;
+  units: number;
+  pnlUsd: number | null;
+  usdcBalanceAfter: number;
+}
+
+export interface Portfolio {
+  startingBalanceUsd: number;
+  usdcBalance: number;
+  holdings: Record<string, Holding>;
+  totalValueUsd: number;
+  totalPnlUsd: number;
+  totalPnlPct: number;
+  realisedPnlUsd: number;
+  unrealisedPnlUsd: number;
+  tradesTotal: number;
+  winningTrades: number;
+  losingTrades: number;
+  tradeHistory: TradeRecord[];
+  startedAt: number;
+  lastUpdatedAt: number;
+}
+
 export interface Policy {
   maxSpendUsd: number;
   confidenceThreshold: number;
   cooldownSeconds: number;
   allowedTokens: string[];
+  maxPositionUsd?: number;
+  maxDrawdownPct?: number;
+  strategy?: string;
   paused?: boolean;
 }

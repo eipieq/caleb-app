@@ -1,5 +1,5 @@
 import { AGENT_API } from "./config";
-import type { Session, Policy, AttestationsResult } from "./types";
+import type { Session, Policy, AttestationsResult, Portfolio } from "./types";
 
 export async function getSessions(): Promise<Session[]> {
   const res = await fetch(`${AGENT_API}/api/sessions`, { cache: "no-store" });
@@ -19,9 +19,10 @@ export async function verifySession(id: string) {
   return res.json();
 }
 
-export async function getPolicy(): Promise<Policy> {
-  const res = await fetch(`${AGENT_API}/api/policy`, { cache: "no-store" });
-  if (!res.ok) return { maxSpendUsd: 50, confidenceThreshold: 0.7, cooldownSeconds: 3600, allowedTokens: ["INIT", "ETH", "USDC"] };
+export async function getPolicy(address?: string): Promise<Policy> {
+  const url = address ? `${AGENT_API}/api/policy/${address}` : `${AGENT_API}/api/policy`;
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) return { maxSpendUsd: 50, confidenceThreshold: 0.3, cooldownSeconds: 0, allowedTokens: ["INIT", "ETH", "USDC"] };
   return res.json();
 }
 
@@ -31,8 +32,15 @@ export async function getAttestations(id: string): Promise<AttestationsResult> {
   return res.json();
 }
 
-export async function savePolicy(policy: Policy): Promise<void> {
-  const res = await fetch(`${AGENT_API}/api/policy`, {
+export async function getPortfolio(): Promise<Portfolio> {
+  const res = await fetch(`${AGENT_API}/api/portfolio`, { cache: "no-store" });
+  if (!res.ok) throw new Error("portfolio not available");
+  return res.json();
+}
+
+export async function savePolicy(policy: Policy, address?: string): Promise<void> {
+  const url = address ? `${AGENT_API}/api/policy/${address}` : `${AGENT_API}/api/policy`;
+  const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(policy),

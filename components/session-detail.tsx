@@ -39,10 +39,12 @@ export function SessionDetail({ session }: { session: Session }) {
   const [attestError, setAttestError] = useState<string | null>(null);
 
   const decision = session.steps?.find((s) => s.kind === "DECISION");
-  const verdict = (decision?.payload?.verdict as string) ?? "SKIP";
+  const verdict   = (decision?.payload?.verdict as string) ?? "SKIP";
   const confidence = (decision?.payload?.confidence as number) ?? 0;
-  const reasoning = (decision?.payload?.reasoning as string) ?? "";
+  const reasoning  = (decision?.payload?.reasoning as string) ?? "";
+  const strategy   = (decision?.payload?.strategy as string) ?? session.strategy ?? null;
   const isBuy = verdict === "BUY";
+  const isSell = verdict === "SELL";
 
   const loadAttestations = useCallback(async () => {
     const data = await getAttestations(session.sessionId);
@@ -121,10 +123,13 @@ export function SessionDetail({ session }: { session: Session }) {
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-3">
-                <Badge variant={isBuy ? "default" : "secondary"} className="text-sm">
+                <Badge variant={isBuy ? "default" : isSell ? "destructive" : "secondary"} className="text-sm">
                   {verdict}
                 </Badge>
-                <span className="text-muted-foreground font-mono text-sm">{confidence.toFixed(2)} confidence</span>
+                <span className="text-muted-foreground font-mono text-sm">{confidence.toFixed(2)} signal</span>
+                {strategy && (
+                  <span className="text-xs text-muted-foreground/60">{strategy}</span>
+                )}
                 {attestations.length > 0 && (
                   <span className="flex items-center gap-1 text-xs text-muted-foreground">
                     <UsersIcon className="size-3" />
@@ -240,11 +245,11 @@ export function SessionDetail({ session }: { session: Session }) {
         </Card>
       )}
 
-      {/* AI Reasoning */}
+      {/* Signal Reasoning */}
       {reasoning && (
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>AI Reasoning</CardTitle>
+            <CardTitle>Signal Reasoning</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground leading-relaxed">{reasoning}</p>
