@@ -38,7 +38,7 @@ export const calebChain = defineChain({
   rpcUrls: { default: { http: [EVM_RPC] } },
 });
 
-export const preyominetChain = defineChain({
+export const initiaTestnetChain = defineChain({
   id: TESTNET_EVM_CHAIN_ID,
   name: "Initia Testnet",
   nativeCurrency: { name: "INIT", symbol: "INIT", decimals: 18 },
@@ -48,7 +48,7 @@ export const preyominetChain = defineChain({
 
 const wagmiConfig = createConfig({
   connectors: [initiaPrivyWalletConnector],
-  chains: [mainnet, calebChain, preyominetChain],
+  chains: [mainnet, calebChain, initiaTestnetChain],
   transports: {
     [mainnet.id]: http(),
     [EVM_CHAIN_ID]: http(EVM_RPC),
