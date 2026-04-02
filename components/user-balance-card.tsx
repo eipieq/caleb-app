@@ -2,7 +2,7 @@
 
 import { useInterwovenKit } from "@initia/interwovenkit-react";
 import { useBalance } from "wagmi";
-import { EVM_CHAIN_ID } from "@/lib/config";
+import { TESTNET_EVM_CHAIN_ID } from "@/lib/config";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -15,7 +15,7 @@ export function UserBalanceCard() {
 
   const { data: initBalance, isLoading } = useBalance({
     address: hexAddress as `0x${string}`,
-    chainId: EVM_CHAIN_ID,
+    chainId: TESTNET_EVM_CHAIN_ID,
     query: { enabled: isConnected && !!hexAddress, refetchInterval: 10_000 },
   });
 
@@ -36,7 +36,7 @@ export function UserBalanceCard() {
                 {hexAddress.slice(0, 6)}…{hexAddress.slice(-4)}
               </Badge>
             </CardTitle>
-            <CardDescription>Live balance on caleb-chain</CardDescription>
+            <CardDescription>Live balance on Initia testnet</CardDescription>
           </div>
           <Button size="sm" variant="outline" render={<Link href="/strategy" />} nativeButton={false}>
             Strategy <ArrowRightIcon className="size-3.5 ml-1" />
@@ -59,7 +59,7 @@ export function UserBalanceCard() {
           </div>
           <div className="flex flex-col gap-0.5">
             <span className="text-xs text-muted-foreground">Network</span>
-            <span className="text-sm font-medium">caleb-chain</span>
+            <span className="text-sm font-medium">Initia testnet</span>
           </div>
         </div>
       </CardContent>

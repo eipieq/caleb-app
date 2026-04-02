@@ -12,7 +12,7 @@ import {
   TESTNET,
 } from "@initia/interwovenkit-react";
 import InterwovenKitStyles from "@initia/interwovenkit-react/styles.js";
-import { CHAIN_ID, EVM_CHAIN_ID, EVM_RPC } from "@/lib/config";
+import { CHAIN_ID, EVM_CHAIN_ID, EVM_RPC, TESTNET_EVM_RPC, TESTNET_EVM_CHAIN_ID } from "@/lib/config";
 
 // InterwovenKit chain config (Cosmos-style)
 const calebChainIwk = {
@@ -30,7 +30,7 @@ const calebChainIwk = {
   evm_chain_id: EVM_CHAIN_ID,
 };
 
-// viem/wagmi chain definition (EVM-style)
+// viem/wagmi chain definitions (EVM-style)
 export const calebChain = defineChain({
   id: EVM_CHAIN_ID,
   name: "Caleb",
@@ -38,19 +38,27 @@ export const calebChain = defineChain({
   rpcUrls: { default: { http: [EVM_RPC] } },
 });
 
+export const preyominetChain = defineChain({
+  id: TESTNET_EVM_CHAIN_ID,
+  name: "Initia Testnet",
+  nativeCurrency: { name: "INIT", symbol: "INIT", decimals: 18 },
+  rpcUrls: { default: { http: [TESTNET_EVM_RPC] } },
+  testnet: true,
+});
+
 const wagmiConfig = createConfig({
   connectors: [initiaPrivyWalletConnector],
-  chains: [mainnet, calebChain],
+  chains: [mainnet, calebChain, preyominetChain],
   transports: {
     [mainnet.id]: http(),
     [EVM_CHAIN_ID]: http(EVM_RPC),
+    [TESTNET_EVM_CHAIN_ID]: http(TESTNET_EVM_RPC),
   },
 });
 
-const queryClient = new QueryClient();
-
 export function Providers({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
+  const [queryClient] = useState(() => new QueryClient());
 
   useEffect(() => {
     injectStyles(InterwovenKitStyles);

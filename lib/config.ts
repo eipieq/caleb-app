@@ -3,6 +3,10 @@ export const INDEXER_API = process.env.NEXT_PUBLIC_INDEXER_API ?? "http://64.227
 export const EVM_RPC = process.env.NEXT_PUBLIC_EVM_RPC ?? "http://64.227.139.172:8545";
 export const CHAIN_ID = "caleb-chain";
 export const EVM_CHAIN_ID = 1043515499963059;
+
+// Initia testnet EVM (Preyominet) — used for wallet balance display
+export const TESTNET_EVM_RPC = "https://json-rpc.preyominet.initia.tech";
+export const TESTNET_EVM_CHAIN_ID = 4471190363524365;
 export const CONTRACT_ADDRESS = "0x22679adc7475B922901137F22D120404c074044f";
 export const EXPLORER_TX = (hash: string) =>
   `https://scan.testnet.initia.xyz/caleb-chain/txs/${hash}`;
