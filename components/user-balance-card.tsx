@@ -2,6 +2,7 @@
 
 import { useInterwovenKit } from "@initia/interwovenkit-react";
 import { useQuery } from "@tanstack/react-query";
+import { bech32 } from "@scure/base";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,7 +12,13 @@ import { Button } from "@/components/ui/button";
 
 const INITIA_REST = "https://rest.testnet.initia.xyz";
 
-async function fetchInitBalance(cosmosAddress: string): Promise<number> {
+function hexToBech32(hex: string, prefix = "init"): string {
+  const bytes = Uint8Array.from(Buffer.from(hex.replace("0x", ""), "hex"));
+  return bech32.encode(prefix, bech32.toWords(bytes));
+}
+
+async function fetchInitBalance(hexAddress: string): Promise<number> {
+  const cosmosAddress = hexToBech32(hexAddress);
   const res = await fetch(
     `${INITIA_REST}/cosmos/bank/v1beta1/balances/${cosmosAddress}`,
     { cache: "no-store" }
@@ -23,16 +30,12 @@ async function fetchInitBalance(cosmosAddress: string): Promise<number> {
 }
 
 export function UserBalanceCard() {
-  const { isConnected, hexAddress, address: cosmosAddress } = useInterwovenKit() as {
-    isConnected: boolean;
-    hexAddress: string;
-    address: string;
-  };
+  const { isConnected, hexAddress } = useInterwovenKit();
 
   const { data: balance, isLoading } = useQuery({
-    queryKey: ["initBalance", cosmosAddress],
-    queryFn: () => fetchInitBalance(cosmosAddress),
-    enabled: isConnected && !!cosmosAddress,
+    queryKey: ["initBalance", hexAddress],
+    queryFn: () => fetchInitBalance(hexAddress),
+    enabled: isConnected && !!hexAddress,
     refetchInterval: 15_000,
   });
 
