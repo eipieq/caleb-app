@@ -21,6 +21,11 @@ const calebChainIwk = {
   pretty_name: "Caleb",
   logo_URIs: { png: "" },
   metadata: { minitia: { type: "minievm" } },
+  fees: {
+    fee_tokens: [
+      { denom: "uinit", fixed_min_gas_price: 0.015, low_gas_price: 0.015, average_gas_price: 0.015, high_gas_price: 0.04 },
+    ],
+  },
   apis: {
     rpc: [{ address: "http://64.227.139.172:26657" }],
     rest: [{ address: "http://64.227.139.172:1317" }],
