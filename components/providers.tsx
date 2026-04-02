@@ -14,7 +14,8 @@ import {
 import InterwovenKitStyles from "@initia/interwovenkit-react/styles.js";
 import { CHAIN_ID, EVM_CHAIN_ID, EVM_RPC } from "@/lib/config";
 
-const calebChain = {
+// InterwovenKit chain config (Cosmos-style)
+const calebChainIwk = {
   chain_id: CHAIN_ID,
   chain_name: CHAIN_ID,
   pretty_name: "Caleb",
@@ -29,7 +30,8 @@ const calebChain = {
   evm_chain_id: EVM_CHAIN_ID,
 };
 
-export const calebChainViem = defineChain({
+// viem/wagmi chain definition (EVM-style)
+export const calebChain = defineChain({
   id: EVM_CHAIN_ID,
   name: "Caleb",
   nativeCurrency: { name: "INIT", symbol: "INIT", decimals: 18 },
@@ -38,7 +40,7 @@ export const calebChainViem = defineChain({
 
 const wagmiConfig = createConfig({
   connectors: [initiaPrivyWalletConnector],
-  chains: [mainnet, calebChainViem],
+  chains: [mainnet, calebChain],
   transports: {
     [mainnet.id]: http(),
     [EVM_CHAIN_ID]: http(EVM_RPC),
@@ -62,7 +64,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <InterwovenKitProvider
           {...TESTNET}
           defaultChainId={CHAIN_ID}
-          customChain={calebChain as never}
+          customChain={calebChainIwk as never}
           theme="light"
           enableAutoSign
         >

@@ -4,6 +4,7 @@ import { AgentStatus } from "@/components/agent-status";
 import { StatsBar } from "@/components/stats-bar";
 import { PortfolioCard } from "@/components/portfolio-card";
 import { ConnectCta } from "@/components/connect-cta";
+import { UserBalanceCard } from "@/components/user-balance-card";
 import { Badge } from "@/components/ui/badge";
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "@/components/ui/empty";
 import { ClockIcon } from "lucide-react";
@@ -39,6 +40,11 @@ export default async function Home() {
         </div>
       </div>
 
+      {/* connected wallet balance */}
+      <div className="mb-4">
+        <UserBalanceCard />
+      </div>
+
       {portfolio && (
         <div className="mb-8">
           <PortfolioCard portfolio={portfolio} />
@@ -52,7 +58,7 @@ export default async function Home() {
               <ClockIcon />
             </EmptyMedia>
             <EmptyTitle>No sessions yet</EmptyTitle>
-            <EmptyDescription>The agent runs every hour. Sessions will appear here once the first cycle completes.</EmptyDescription>
+            <EmptyDescription>Sessions will appear here once the agent completes a cycle.</EmptyDescription>
           </EmptyHeader>
         </Empty>
       ) : (
