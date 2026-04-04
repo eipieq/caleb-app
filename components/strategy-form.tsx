@@ -12,7 +12,8 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Field, FieldGroup, FieldTitle, FieldDescription } from "@/components/ui/field";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
-import { CheckIcon, WalletIcon } from "lucide-react";
+import Image from "next/image";
+import { CheckIcon } from "lucide-react";
 
 const ALL_TOKENS = ["INIT", "ETH", "USDC"];
 const ALL_STRATEGIES = ["momentum", "mean-revert"];
@@ -56,27 +57,24 @@ export function StrategyForm({ initialPolicy }: { initialPolicy: Policy | null }
 
   if (!isConnected) {
     return (
-      <div className="max-w-4xl mx-auto px-6 py-8">
-        <div className="flex flex-col gap-1 mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">Strategy</h1>
-          <p className="text-muted-foreground">
-            Configure the trading strategy and risk limits. Changes take effect on the next tick.
+      <div className="flex flex-col items-center justify-center gap-6 py-20 px-6 text-center">
+        <Image
+          src="/wallet.jpeg"
+          alt="connect wallet"
+          width={200}
+          height={200}
+          className="rounded-2xl opacity-90"
+          priority
+        />
+        <div className="flex flex-col gap-1.5">
+          <p className="font-semibold tracking-tight">connect your wallet to configure a strategy</p>
+          <p className="text-sm text-muted-foreground max-w-xs">
+            your strategy is saved to your wallet address and applied on every tick.
           </p>
         </div>
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-16 gap-4 text-center">
-            <div className="size-12 rounded-full bg-muted flex items-center justify-center">
-              <WalletIcon className="size-5 text-muted-foreground" />
-            </div>
-            <div>
-              <p className="font-semibold">Connect your wallet to configure a strategy</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Your strategy is saved to your wallet address and applied on every tick.
-              </p>
-            </div>
-            <Button onClick={openConnect}>Connect wallet</Button>
-          </CardContent>
-        </Card>
+        <Button onClick={openConnect} variant="outline" className="text-xs h-8 px-4">
+          connect wallet
+        </Button>
       </div>
     );
   }

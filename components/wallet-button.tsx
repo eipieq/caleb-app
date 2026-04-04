@@ -2,7 +2,6 @@
 
 import { useInterwovenKit, InterwovenKit } from "@initia/interwovenkit-react";
 import { Button } from "@/components/ui/button";
-import { WalletIcon } from "lucide-react";
 
 export function WalletButton() {
   const { isConnected, hexAddress, openConnect, openWallet } = useInterwovenKit();
@@ -10,14 +9,15 @@ export function WalletButton() {
   return (
     <>
       {isConnected ? (
-        <Button variant="outline" size="sm" onClick={openWallet}>
-          <WalletIcon data-icon="inline-start" />
-          {hexAddress.slice(0, 6)}...{hexAddress.slice(-4)}
-        </Button>
+        <button
+          onClick={openWallet}
+          className="font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
+        >
+          {hexAddress.slice(0, 6)}…{hexAddress.slice(-4)}
+        </button>
       ) : (
-        <Button size="sm" onClick={openConnect}>
-          <WalletIcon data-icon="inline-start" />
-          Connect
+        <Button size="sm" variant="outline" onClick={openConnect} className="text-xs h-7 px-3">
+          connect wallet
         </Button>
       )}
       <div className="hidden">

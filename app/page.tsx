@@ -1,5 +1,5 @@
 import { getSessions, getPortfolio } from "@/lib/api";
-import { SessionCard } from "@/components/session-card";
+import { SessionFeed } from "@/components/session-feed";
 import { AgentStatus } from "@/components/agent-status";
 import { StatsBar } from "@/components/stats-bar";
 import { PortfolioCard } from "@/components/portfolio-card";
@@ -62,11 +62,7 @@ export default async function Home() {
           </EmptyHeader>
         </Empty>
       ) : (
-        <div className="flex flex-col gap-2">
-          {sessions.map((s) => (
-            <SessionCard key={s.sessionId} session={s} />
-          ))}
-        </div>
+        <SessionFeed sessions={sessions} />
       )}
     </div>
   );
