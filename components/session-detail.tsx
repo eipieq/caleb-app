@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { ArrowLeftIcon, ExternalLinkIcon, CheckIcon, XIcon, ShieldCheckIcon, UsersIcon } from "lucide-react";
+import { ArrowLeftIcon, ExternalLinkIcon, CheckIcon, XIcon, ShieldCheckIcon, UsersIcon, CopyIcon } from "lucide-react";
 import { useInterwovenKit } from "@initia/interwovenkit-react";
 import { encodeFunctionData } from "viem";
 import { MsgCall } from "@initia/initia.proto/minievm/evm/v1/tx";
@@ -202,15 +202,14 @@ export function SessionDetail({ session }: { session: Session }) {
               {result.allPassed ? "All 5 hashes match on-chain" : "Hash mismatch detected"}
             </Badge>
             {attestTxHash && (
-              <a
-                href={EXPLORER_TX(attestTxHash)}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                title={`attestation tx: ${attestTxHash}\n\non caleb-chain — query via RPC at 64.227.139.172:26657`}
+                onClick={() => navigator.clipboard.writeText(attestTxHash)}
                 className="text-xs font-mono text-muted-foreground hover:text-foreground flex items-center gap-1"
               >
                 Attestation tx: {attestTxHash.slice(0, 20)}...
-                <ExternalLinkIcon className="size-3" />
-              </a>
+                <CopyIcon className="size-3" />
+              </button>
             )}
           </CardContent>
         )}
@@ -283,21 +282,14 @@ export function SessionDetail({ session }: { session: Session }) {
                     </Badge>
                   )}
 
-                  <Button
-                    variant="ghost"
-                    size="xs"
-                    render={
-                      <a
-                        href={EXPLORER_TX(step.txHash)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      />
-                    }
-                    nativeButton={false}
+                  <button
+                    title={`tx: ${step.txHash}\n\non caleb-chain — query via RPC at 64.227.139.172:26657`}
+                    onClick={() => navigator.clipboard.writeText(step.txHash)}
+                    className="flex items-center gap-1 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    <span className="font-mono">{step.txHash.slice(0, 8)}...</span>
-                    <ExternalLinkIcon data-icon="inline-end" />
-                  </Button>
+                    {step.txHash.slice(0, 8)}...
+                    <CopyIcon className="size-3" />
+                  </button>
                 </div>
               );
             })}
