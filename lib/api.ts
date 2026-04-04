@@ -14,7 +14,8 @@ export async function getSession(id: string): Promise<Session> {
 }
 
 export async function verifySession(id: string) {
-  const res = await fetch(`${AGENT_API}/api/verify/${id}`, { cache: "no-store" });
+  // proxy through Next.js to avoid mixed-content (HTTP VPS from HTTPS page)
+  const res = await fetch(`/api/verify/${id}`, { cache: "no-store" });
   if (!res.ok) throw new Error("verify failed");
   return res.json();
 }
@@ -27,7 +28,8 @@ export async function getPolicy(address?: string): Promise<Policy> {
 }
 
 export async function getAttestations(id: string): Promise<AttestationsResult> {
-  const res = await fetch(`${AGENT_API}/api/attestations/${id}`, { cache: "no-store" });
+  // proxy through Next.js to avoid mixed-content
+  const res = await fetch(`/api/attestations/${id}`, { cache: "no-store" });
   if (!res.ok) return { sessionId: id, attestations: [], count: 0 };
   return res.json();
 }
