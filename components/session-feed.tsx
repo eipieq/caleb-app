@@ -6,6 +6,9 @@ import type { Session } from "@/lib/types";
 
 const PAGE_SIZE = 5;
 
+// sessions before this were committed by a cron-based agent with a different payload format
+export const LEGACY_CUTOFF = new Date("2026-04-06T00:00:00Z").getTime() / 1000;
+
 function dayKey(ts: number): string {
   return new Date(ts * 1000).toLocaleDateString("en-CA"); // YYYY-MM-DD
 }
@@ -39,7 +42,6 @@ function DayGroup({ label, sessions }: { label: string; sessions: Session[] }) {
 
   return (
     <div className="flex flex-col gap-2">
-      {/* day header */}
       <div className="flex items-center gap-3 py-1">
         <span className="text-xs font-mono text-muted-foreground/50 uppercase tracking-widest">
           {label}
@@ -48,14 +50,12 @@ function DayGroup({ label, sessions }: { label: string; sessions: Session[] }) {
         <div className="flex-1 h-px bg-border/30" />
       </div>
 
-      {/* cards */}
       <div className="flex flex-col gap-2">
         {shown.map((s) => (
           <SessionCard key={s.sessionId} session={s} />
         ))}
       </div>
 
-      {/* show more / less */}
       {sessions.length > PAGE_SIZE && (
         <button
           onClick={() => setExpanded((v) => !v)}
@@ -69,13 +69,27 @@ function DayGroup({ label, sessions }: { label: string; sessions: Session[] }) {
 }
 
 export function SessionFeed({ sessions }: { sessions: Session[] }) {
-  const groups = groupByDay(sessions);
+  const [showArchive, setShowArchive] = useState(false);
+
+  const fresh   = sessions.filter((s) => s.startedAt >= LEGACY_CUTOFF);
+  const archive = sessions.filter((s) => s.startedAt < LEGACY_CUTOFF);
+  const visible = showArchive ? sessions : fresh;
+  const groups  = groupByDay(visible);
 
   return (
     <div className="flex flex-col gap-8">
       {groups.map((g) => (
         <DayGroup key={g.key} label={g.label} sessions={g.sessions} />
       ))}
+
+      {archive.length > 0 && (
+        <button
+          onClick={() => setShowArchive((v) => !v)}
+          className="text-xs font-mono text-muted-foreground/30 hover:text-muted-foreground/60 transition-colors text-left py-1"
+        >
+          {showArchive ? "hide archive ↑" : `show ${archive.length} archived sessions ↓`}
+        </button>
+      )}
     </div>
   );
 }
