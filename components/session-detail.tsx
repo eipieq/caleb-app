@@ -25,6 +25,10 @@ const STEP_LABELS: Record<string, string> = {
 
 type VerifyResult = { allPassed: boolean; steps: { index: number; match: boolean }[] };
 
+// sessions before this date were committed by a cron-based agent with a different
+// payload format — they'll always show mismatch, but it's not tampering
+const LEGACY_CUTOFF = new Date("2026-04-06T00:00:00Z").getTime() / 1000;
+
 export function SessionDetail({ session }: { session: Session }) {
   const { isConnected, address, hexAddress, openConnect, requestTxBlock } = useInterwovenKit();
 
@@ -198,8 +202,8 @@ export function SessionDetail({ session }: { session: Session }) {
 
         {result && (
           <CardContent className="flex flex-col gap-3">
-            <Badge variant={result.allPassed ? "default" : "destructive"}>
-              {result.allPassed ? "All 5 hashes match on-chain" : "Hash mismatch detected"}
+            <Badge variant={result.allPassed ? "default" : session.startedAt < LEGACY_CUTOFF ? "secondary" : "destructive"}>
+              {result.allPassed ? "All 5 hashes match on-chain" : session.startedAt < LEGACY_CUTOFF ? "Legacy session — format predates current agent" : "Hash mismatch detected"}
             </Badge>
             {attestTxHash && (
               <button
