@@ -1,8 +1,8 @@
 import { AGENT_API } from "./config";
 import type { Session, Policy, AttestationsResult, Portfolio } from "./types";
 
-export async function getSessions(): Promise<Session[]> {
-  const res = await fetch(`${AGENT_API}/api/sessions`, { cache: "no-store" });
+export async function getSessions(limit = 50): Promise<Session[]> {
+  const res = await fetch(`${AGENT_API}/api/sessions?limit=${limit}`, { cache: "no-store" });
   if (!res.ok) throw new Error("failed to fetch sessions");
   return res.json();
 }
