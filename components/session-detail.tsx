@@ -120,7 +120,7 @@ export function SessionDetail({ session }: { session: Session }) {
 
       {/* chain commit failed banner */}
       {(session as any).committed === false && (
-        <div className="mb-4 flex items-start gap-2 rounded-lg border border-yellow-500/30 bg-yellow-500/5 px-4 py-3 text-xs text-yellow-400">
+        <div className="mb-4 flex items-start gap-2 rounded-lg border border-yellow-500/20 bg-zinc-900 px-4 py-3 text-xs text-yellow-400">
           <AlertTriangleIcon className="size-3.5 mt-0.5 shrink-0" />
           <span className="flex flex-col gap-1">
             <span>
