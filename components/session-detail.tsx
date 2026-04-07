@@ -129,7 +129,7 @@ export function SessionDetail({ session }: { session: Session }) {
                 <span className="ml-1 font-mono opacity-70">{(session as any).commitError}</span>
               )}
             </span>
-            <span className="text-yellow-400/50">
+            <span className="text-muted-foreground">
               this was a nonce race condition in the runner — when two sessions overlapped,
               the chain rejected the tx with a sequence mismatch. the trade was recorded in
               the portfolio but the session file was never saved. fixed: the runner now
