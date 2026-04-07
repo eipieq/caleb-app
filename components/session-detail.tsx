@@ -122,11 +122,20 @@ export function SessionDetail({ session }: { session: Session }) {
       {(session as any).committed === false && (
         <div className="mb-4 flex items-start gap-2 rounded-lg border border-yellow-500/30 bg-yellow-500/5 px-4 py-3 text-xs text-yellow-400">
           <AlertTriangleIcon className="size-3.5 mt-0.5 shrink-0" />
-          <span>
-            chain commit failed — on-chain proof unavailable for this session.
-            {(session as any).commitError && (
-              <span className="ml-1 font-mono opacity-70">{(session as any).commitError}</span>
-            )}
+          <span className="flex flex-col gap-1">
+            <span>
+              chain commit failed — on-chain proof unavailable for this session.
+              {(session as any).commitError && (
+                <span className="ml-1 font-mono opacity-70">{(session as any).commitError}</span>
+              )}
+            </span>
+            <span className="text-yellow-400/50">
+              this was a nonce race condition in the runner — when two sessions overlapped,
+              the chain rejected the tx with a sequence mismatch. the trade was recorded in
+              the portfolio but the session file was never saved. fixed: the runner now
+              re-fetches the nonce before every tx and saves a session file before any chain
+              commit fires.
+            </span>
           </span>
         </div>
       )}
