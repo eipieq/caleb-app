@@ -296,14 +296,18 @@ export function SessionDetail({ session }: { session: Session }) {
                     </Badge>
                   )}
 
-                  <button
-                    title={`tx: ${step.txHash}\n\non caleb-chain — query via RPC at 64.227.139.172:26657`}
-                    onClick={() => navigator.clipboard.writeText(step.txHash)}
-                    className="flex items-center gap-1 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {step.txHash.slice(0, 8)}...
-                    <CopyIcon className="size-3" />
-                  </button>
+                  {step.txHash ? (
+                    <button
+                      title={`tx: ${step.txHash}\n\non caleb-chain — query via RPC at 64.227.139.172:26657`}
+                      onClick={() => navigator.clipboard.writeText(step.txHash)}
+                      className="flex items-center gap-1 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {step.txHash.slice(0, 8)}...
+                      <CopyIcon className="size-3" />
+                    </button>
+                  ) : (
+                    <span className="font-mono text-xs text-muted-foreground/40">no tx</span>
+                  )}
                 </div>
               );
             })}
