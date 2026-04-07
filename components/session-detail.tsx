@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { ArrowLeftIcon, ExternalLinkIcon, CheckIcon, XIcon, ShieldCheckIcon, UsersIcon, CopyIcon } from "lucide-react";
+import { ArrowLeftIcon, ExternalLinkIcon, CheckIcon, XIcon, ShieldCheckIcon, UsersIcon, CopyIcon, AlertTriangleIcon } from "lucide-react";
 import { useInterwovenKit } from "@initia/interwovenkit-react";
 import { encodeFunctionData } from "viem";
 import { MsgCall } from "@initia/initia.proto/minievm/evm/v1/tx";
@@ -117,6 +117,19 @@ export function SessionDetail({ session }: { session: Session }) {
         <ArrowLeftIcon data-icon="inline-start" />
         Back
       </Button>
+
+      {/* chain commit failed banner */}
+      {(session as any).committed === false && (
+        <div className="mb-4 flex items-start gap-2 rounded-lg border border-yellow-500/30 bg-yellow-500/5 px-4 py-3 text-xs text-yellow-400">
+          <AlertTriangleIcon className="size-3.5 mt-0.5 shrink-0" />
+          <span>
+            chain commit failed — on-chain proof unavailable for this session.
+            {(session as any).commitError && (
+              <span className="ml-1 font-mono opacity-70">{(session as any).commitError}</span>
+            )}
+          </span>
+        </div>
+      )}
 
       {/* Header */}
       <Card className="mb-6">
