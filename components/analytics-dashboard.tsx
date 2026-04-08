@@ -135,7 +135,7 @@ export function AnalyticsDashboard({ portfolio, sessions }: { portfolio: Portfol
                 <YAxis tick={{ fontSize: 10, fill: "hsl(240 5% 45%)" }} tickLine={false} axisLine={false} tickFormatter={(v) => `$${v}`} />
                 <Tooltip
                   contentStyle={{ background: "hsl(240 10% 8%)", border: "1px solid hsl(240 5% 20%)", borderRadius: 8, fontSize: 12 }}
-                  formatter={(v: number) => [`$${v.toFixed(4)}`, "cumulative P&L"]}
+                  formatter={(v) => [`$${(v as number).toFixed(4)}`, "cumulative P&L"]}
                 />
                 <Area type="monotone" dataKey="pnl" stroke={pnlColor} fill="url(#pnlGrad)" strokeWidth={2} dot={false} />
               </AreaChart>
@@ -158,7 +158,7 @@ export function AnalyticsDashboard({ portfolio, sessions }: { portfolio: Portfol
                 <YAxis tick={{ fontSize: 10, fill: "hsl(240 5% 45%)" }} tickLine={false} axisLine={false} tickFormatter={(v) => `$${v}`} />
                 <Tooltip
                   contentStyle={{ background: "hsl(240 10% 8%)", border: "1px solid hsl(240 5% 20%)", borderRadius: 8, fontSize: 12 }}
-                  formatter={(v: number) => [`$${v.toFixed(2)}`, "USDC balance"]}
+                  formatter={(v) => [`$${(v as number).toFixed(2)}`, "USDC balance"]}
                 />
                 <Line type="monotone" dataKey="value" stroke={ACCENT} strokeWidth={2} dot={false} />
               </LineChart>
@@ -211,7 +211,7 @@ export function AnalyticsDashboard({ portfolio, sessions }: { portfolio: Portfol
                   <YAxis tick={{ fontSize: 10, fill: "hsl(240 5% 45%)" }} tickLine={false} axisLine={false} />
                   <Tooltip
                     contentStyle={{ background: "hsl(240 10% 8%)", border: "1px solid hsl(240 5% 20%)", borderRadius: 8, fontSize: 12 }}
-                    formatter={(v: number) => [v, "sessions"]}
+                    formatter={(v) => [v as number, "sessions"]}
                   />
                   <Bar dataKey="count" fill={ACCENT} radius={[3, 3, 0, 0]} />
                 </BarChart>
