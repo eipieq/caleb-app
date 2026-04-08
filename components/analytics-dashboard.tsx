@@ -45,11 +45,18 @@ export function AnalyticsDashboard({ portfolio, sessions }: { portfolio: Portfol
       });
   })();
 
-  // portfolio value over time
-  const valueData = portfolio.tradeHistory.map((t) => ({
-    date: new Date(t.timestamp * 1000).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-    value: parseFloat(t.usdcBalanceAfter.toFixed(2)),
-  }));
+  // portfolio value over time — starting balance + cumulative realized P&L
+  // (usdcBalanceAfter alone dips on BUY trades since USDC was spent on the asset)
+  const valueData = (() => {
+    let cumPnl = 0;
+    return portfolio.tradeHistory.map((t) => {
+      cumPnl += t.pnlUsd ?? 0;
+      return {
+        date: new Date(t.timestamp * 1000).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+        value: parseFloat((portfolio.startingBalanceUsd + cumPnl).toFixed(2)),
+      };
+    });
+  })();
 
   // verdict breakdown
   const verdictCounts = sessions.reduce(
