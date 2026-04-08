@@ -30,19 +30,23 @@ function StatCard({ label, value, sub }: { label: string; value: string; sub?: s
 }
 
 export function AnalyticsDashboard({ portfolio, sessions }: { portfolio: Portfolio; sessions: Session[] }) {
-  // P&L over time — cumulative from trade history
+  // P&L over time — cumulative realized P&L, with a final "now" point including unrealized
   const pnlData = (() => {
     let cumulative = 0;
-    return portfolio.tradeHistory
+    const points = portfolio.tradeHistory
       .filter((t) => t.pnlUsd !== null)
       .map((t) => {
         cumulative += t.pnlUsd ?? 0;
         return {
           date: new Date(t.timestamp * 1000).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
           pnl: parseFloat(cumulative.toFixed(4)),
-          trade: parseFloat((t.pnlUsd ?? 0).toFixed(4)),
         };
       });
+    // append current total (includes unrealized gains from open positions)
+    if (Math.abs(portfolio.totalPnlUsd - cumulative) > 0.01) {
+      points.push({ date: "now", pnl: parseFloat(portfolio.totalPnlUsd.toFixed(4)) });
+    }
+    return points;
   })();
 
   // portfolio value over time — starting balance + cumulative realized P&L
