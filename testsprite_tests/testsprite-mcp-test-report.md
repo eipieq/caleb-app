@@ -3,7 +3,7 @@
 
 ---
 
-## 1️⃣ Document Metadata
+## 1. Document Metadata
 - **Project Name:** caleb-app
 - **Date:** 2026-04-17
 - **Round:** 5 (final)
@@ -11,7 +11,7 @@
 
 ---
 
-## 2️⃣ Requirement Validation Summary
+## 2. Requirement Validation Summary
 
 ### Requirement: Live Trade Feed
 - **Description:** Real-time session feed with auto-refresh, expandable list, and session cards showing verdict, token, confidence, and amount.
@@ -204,7 +204,7 @@
 - **Analysis / Findings:** Privy auth flow failed. Cannot reach policy form.
 ---
 
-## 3️⃣ Coverage & Matching Metrics
+## 3. Coverage & Matching Metrics
 
 - **45.8%** of all tests passed (11/24)
 - **68.8%** effective pass rate excluding wallet-blocked tests (11/16)
@@ -232,7 +232,7 @@
 
 ---
 
-## 4️⃣ Key Gaps / Risks
+## 4. Key Gaps / Risks
 
 **Wallet-dependent flows are untestable in headless environments.** 8 of 24 tests (33%) are blocked because they require a browser wallet extension (MetaMask, Keplr) or Privy OAuth flow that cannot complete without user interaction in a real browser. This affects wallet connection, policy editing, and attestation submission. These features work correctly in production with real wallets.
 
