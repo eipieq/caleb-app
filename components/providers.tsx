@@ -14,6 +14,12 @@ import {
 import InterwovenKitStyles from "@initia/interwovenkit-react/styles.js";
 import { CHAIN_ID, EVM_CHAIN_ID, EVM_RPC, TESTNET_EVM_RPC, TESTNET_EVM_CHAIN_ID } from "@/lib/config";
 
+// on the server (SSR) we need absolute URLs; in the browser relative paths work
+const origin = typeof window !== "undefined" ? "" : (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000");
+const PROXY_RPC = `${origin}/api/chain-rpc`;
+const PROXY_REST = `${origin}/api/chain-rest`;
+const PROXY_EVM = `${origin}/api/chain-evm`;
+
 // InterwovenKit chain config (Cosmos-style)
 const calebChainIwk = {
   chain_id: CHAIN_ID,
@@ -27,10 +33,10 @@ const calebChainIwk = {
     ],
   },
   apis: {
-    rpc: [{ address: "http://64.227.139.172:26657" }],
-    rest: [{ address: "http://64.227.139.172:1317" }],
-    "json-rpc": [{ address: EVM_RPC }],
-    indexer: [{ address: "http://64.227.139.172:6767" }],
+    rpc: [{ address: PROXY_RPC }],
+    rest: [{ address: PROXY_REST }],
+    "json-rpc": [{ address: PROXY_EVM }],
+    indexer: [{ address: `${origin}/api/chain-rest` }],
   },
   evm_chain_id: EVM_CHAIN_ID,
 };
@@ -40,7 +46,7 @@ export const calebChain = defineChain({
   id: EVM_CHAIN_ID,
   name: "Caleb",
   nativeCurrency: { name: "INIT", symbol: "INIT", decimals: 18 },
-  rpcUrls: { default: { http: [EVM_RPC] } },
+  rpcUrls: { default: { http: [PROXY_EVM] } },
 });
 
 export const initiaTestnetChain = defineChain({
@@ -56,7 +62,7 @@ const wagmiConfig = createConfig({
   chains: [mainnet, calebChain, initiaTestnetChain],
   transports: {
     [mainnet.id]: http(),
-    [EVM_CHAIN_ID]: http(EVM_RPC),
+    [EVM_CHAIN_ID]: http(PROXY_EVM),
     [TESTNET_EVM_CHAIN_ID]: http(TESTNET_EVM_RPC),
   },
 });
