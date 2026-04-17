@@ -1,0 +1,18 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:3000",
+  "executionArgs": {
+    "projectName": "caleb-app",
+    "projectPath": "/Users/zap/Documents/hackathon/caleb-app",
+    "testIds": [],
+    "additionalInstruction": "When navigating to session detail pages, click the actual link elements on session cards rather than constructing URLs from truncated display text. The href contains the full session hash needed for lookup. If you must construct a URL manually, use the full sessionId from the data, not the truncated display.",
+    "serverMode": "production",
+    "envs": {
+      "API_KEY": "sk-user-_FGL4u0VzDb1om3-Nqec0e9_-Rfftb5FLD4qC9CfEkpd5VevY1FxvvcMolSN4KNWj8N2VIj2cCpE8mfXfoqqgY-0al53qaYt5vVi9a89QEFCRZGcsuS9SAhqoq_H7NTvtDs"
+    }
+  },
+  "serverPort": 61905,
+  "proxy": "http://0219b758-a4c4-444d-9249-b7fcbb621a0d:2SCStGNKVaPKdJXpwqO2JDRi6Sk4krAX@tun.testsprite.com:8080"
+}

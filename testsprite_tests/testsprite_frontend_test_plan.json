@@ -1,0 +1,778 @@
+[
+  {
+    "id": "TC001",
+    "title": "Monitor live trade feed and open a session",
+    "description": "Verifies a guest can view agent status and stats on the home dashboard, expand the live trade feed to older sessions, and open a session detail from a session card.",
+    "category": "Live Trade Feed",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the live trade feed to finish loading"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the live trade feed section"
+      },
+      {
+        "type": "action",
+        "description": "Click the control to expand the feed to reveal older sessions"
+      },
+      {
+        "type": "action",
+        "description": "Click a session card to open its session detail"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify session metadata is displayed on the session detail page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the 5-step audit timeline is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC002",
+    "title": "Review a session’s audit steps, raw JSON, and copy a step hash",
+    "description": "Verifies a guest can expand each audit step to read reasoning, view raw JSON payloads, and copy a step hash from the session detail page.",
+    "category": "Session Detail and Audit Timeline",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the live trade feed to finish loading"
+      },
+      {
+        "type": "action",
+        "description": "Click a session card to open its session detail"
+      },
+      {
+        "type": "action",
+        "description": "Expand the POLICY audit step to reveal reasoning"
+      },
+      {
+        "type": "action",
+        "description": "Open the raw JSON payload disclosure for the POLICY step"
+      },
+      {
+        "type": "action",
+        "description": "Copy the POLICY step hash to clipboard"
+      },
+      {
+        "type": "action",
+        "description": "Expand the MARKET audit step to reveal reasoning"
+      },
+      {
+        "type": "action",
+        "description": "Expand the DECISION audit step to reveal reasoning"
+      },
+      {
+        "type": "action",
+        "description": "Expand the CHECK audit step to reveal reasoning"
+      },
+      {
+        "type": "action",
+        "description": "Expand the EXECUTION audit step to reveal reasoning"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify all five audit steps can be expanded to show reasoning content"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a copy-to-clipboard success confirmation is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC003",
+    "title": "Open session detail from a session card",
+    "description": "Verifies a guest can navigate from a live trade feed session card to the corresponding session detail page.",
+    "category": "Live Trade Feed",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the live trade feed to finish loading"
+      },
+      {
+        "type": "action",
+        "description": "Click a session card to open its session detail"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify session metadata is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the audit timeline steps are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC004",
+    "title": "Portfolio summary renders value, P&L, holdings, and trade history",
+    "description": "Verifies the home portfolio section loads and displays total value, aggregated P&L, holdings overview, and recent trade history for a guest.",
+    "category": "Portfolio Summary",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the portfolio summary section to finish loading"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the portfolio summary section"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify total portfolio value and aggregated P&L are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify holdings and recent trade history entries are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC005",
+    "title": "Trade feed cards show core session summary fields",
+    "description": "Verifies the home live trade feed displays session cards with verdict, token, confidence, and amount so a guest can quickly assess recent activity.",
+    "category": "Live Trade Feed",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the live trade feed to finish loading"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the first visible session card in the trade feed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a session card displays a verdict value, token symbol, confidence value, and trade amount"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC006",
+    "title": "Portfolio trade history proof link drills into session detail",
+    "description": "Verifies a guest can click a proof link from a trade history entry and land on the corresponding session detail page with the audit timeline visible.",
+    "category": "Portfolio Summary",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the portfolio summary section to finish loading"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the trade history list"
+      },
+      {
+        "type": "action",
+        "description": "Click a proof link for a trade history entry"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the session detail page shows the 5-step audit timeline"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify session metadata is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC007",
+    "title": "Verify a session on-chain from session detail",
+    "description": "A user can open a session from the home feed, run on-chain verification, and see match/mismatch badges for each of the 5 audit steps.",
+    "category": "On-chain Verification",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click a session card to open its session detail page"
+      },
+      {
+        "type": "action",
+        "description": "Initiate on-chain verification for the session"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify per-step verification results are displayed for all five audit steps"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify each audit step shows a match or mismatch status badge"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC008",
+    "title": "Live trade feed auto-refresh updates the session list",
+    "description": "Verifies the live trade feed can refresh without manual action and continues to show recent sessions after a short wait.",
+    "category": "Live Trade Feed",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the live trade feed to finish loading"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the feed polling interval to elapse and the feed to refresh"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the live trade feed still displays session cards after the refresh"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC009",
+    "title": "Connect wallet and see address and balance",
+    "description": "A user can connect a wallet and then sees the connected address and INIT balance reflected in the header and balance card.",
+    "category": "Wallet Connection",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Initiate wallet connection from the header"
+      },
+      {
+        "type": "action",
+        "description": "Complete wallet connection in the wallet modal"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a connected wallet address is displayed in the header"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an INIT balance is displayed in the user balance card"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC010",
+    "title": "Open strategy page and see wallet-gated prompt when disconnected",
+    "description": "Verifies a visitor who is not wallet-connected is prompted to connect before viewing or saving policy settings.",
+    "category": "Strategy Configuration",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /strategy"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the strategy configuration view to finish loading"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a wallet connection prompt is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify policy editing and saving controls are not available until a wallet is connected"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC011",
+    "title": "Return to the feed from session detail",
+    "description": "Verifies a guest can navigate back from a session detail page to the home dashboard to continue monitoring the live trade feed.",
+    "category": "Session Detail and Audit Timeline",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the live trade feed to finish loading"
+      },
+      {
+        "type": "action",
+        "description": "Click a session card to open its session detail"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation control to return to the feed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user lands on the home dashboard"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the live trade feed is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC012",
+    "title": "View attestations list and count for a session",
+    "description": "A user can open a session and see the attestation count and a list of attestations for that session.",
+    "category": "Attestations",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click a session card to open its session detail page"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the attestations section"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an attestation count is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an attestations list or an empty state is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC013",
+    "title": "Connect wallet and load current policy",
+    "description": "Verifies a wallet-connected user can connect and see current policy settings loaded for their address.",
+    "category": "Strategy Configuration",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /strategy"
+      },
+      {
+        "type": "action",
+        "description": "Click the wallet connection prompt to start connecting a wallet"
+      },
+      {
+        "type": "action",
+        "description": "Complete the in-app wallet connection flow"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the policy settings to finish loading"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify current policy settings are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify saving the policy is available when connected"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC014",
+    "title": "Disconnect wallet returns to guest state",
+    "description": "A user can disconnect their wallet and the UI returns to the guest state without showing the connected address.",
+    "category": "Wallet Connection",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Initiate wallet connection from the header"
+      },
+      {
+        "type": "action",
+        "description": "Complete wallet connection in the wallet modal"
+      },
+      {
+        "type": "action",
+        "description": "Disconnect the wallet from the wallet menu"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the header shows a disconnected state rather than a wallet address"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify guest state is shown in the balance area"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC015",
+    "title": "View analytics overview with charts",
+    "description": "Verifies a visitor can load the analytics dashboard and see stat cards plus all analytics charts rendered from available data.",
+    "category": "Analytics Dashboard",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /analytics"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the analytics dashboard content to finish loading"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify analytics stat cards are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the cumulative P&L chart, portfolio value chart, verdict breakdown chart, and confidence distribution chart are displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC016",
+    "title": "Edit and save policy successfully",
+    "description": "Verifies a wallet-connected user can edit policy fields and save, with the UI reflecting the updated policy.",
+    "category": "Strategy Configuration",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /strategy"
+      },
+      {
+        "type": "action",
+        "description": "Click the wallet connection prompt to start connecting a wallet"
+      },
+      {
+        "type": "action",
+        "description": "Complete the in-app wallet connection flow"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the policy settings to finish loading"
+      },
+      {
+        "type": "action",
+        "description": "Fill a new valid number into the max spend field"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid confidence threshold value"
+      },
+      {
+        "type": "action",
+        "description": "Fill a valid cooldown value into the cooldown field"
+      },
+      {
+        "type": "action",
+        "description": "Fill valid allowed tokens into the allowed tokens field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the policy save action"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a success confirmation is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated policy is reflected in the UI"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC017",
+    "title": "Collapse audit steps after expanding",
+    "description": "Verifies a guest can collapse an expanded audit step to reduce on-screen detail while staying on the same session detail page.",
+    "category": "Session Detail and Audit Timeline",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the live trade feed to finish loading"
+      },
+      {
+        "type": "action",
+        "description": "Click a session card to open its session detail"
+      },
+      {
+        "type": "action",
+        "description": "Expand an audit step to reveal reasoning"
+      },
+      {
+        "type": "action",
+        "description": "Collapse the same audit step"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the audit step reasoning content is no longer displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC018",
+    "title": "Prompt to connect wallet when attempting to attest while disconnected",
+    "description": "A user who is not wallet-connected is prompted to connect a wallet before they can submit an attestation.",
+    "category": "Attestations",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click a session card to open its session detail page"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the attestations section"
+      },
+      {
+        "type": "action",
+        "description": "Attempt to submit an attestation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a connect-wallet prompt is displayed and attestation submission is not available"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC019",
+    "title": "Persisted policy after reload",
+    "description": "Verifies a saved policy persists by reloading the strategy page and confirming the policy is still present.",
+    "category": "Strategy Configuration",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /strategy"
+      },
+      {
+        "type": "action",
+        "description": "Click the wallet connection prompt to start connecting a wallet"
+      },
+      {
+        "type": "action",
+        "description": "Complete the in-app wallet connection flow"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the policy settings to finish loading"
+      },
+      {
+        "type": "action",
+        "description": "Fill a new valid number into the max spend field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the policy save action"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /strategy"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the policy settings to finish loading"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify policy settings are displayed for the connected address"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the saved policy remains reflected in the UI after reload"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC020",
+    "title": "Analytics empty state when no session data",
+    "description": "Verifies the analytics dashboard shows a non-crashing empty state when there are no sessions to chart.",
+    "category": "Analytics Dashboard",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /analytics"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the analytics dashboard content to finish loading"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an empty state for analytics sessions is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the page remains usable without charts rendering errors"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC021",
+    "title": "Analytics loading state during data fetch",
+    "description": "Verifies the analytics dashboard displays a loading state while fetching analytics data and then transitions to results.",
+    "category": "Analytics Dashboard",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /analytics"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a loading state for analytics content is displayed"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the analytics dashboard content to finish loading"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify analytics charts or an empty state are displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC022",
+    "title": "Analytics chart rendering with minimal data",
+    "description": "Verifies charts render without breaking when the dataset is minimal (for example a single data point).",
+    "category": "Analytics Dashboard",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /analytics"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the analytics dashboard content to finish loading"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the chart sections"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the cumulative P&L and portfolio value charts render without missing-content errors"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC023",
+    "title": "Validation prevents saving invalid policy values",
+    "description": "Verifies entering an invalid policy value (such as a negative max spend) blocks saving and shows a field-level validation error.",
+    "category": "Strategy Configuration",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /strategy"
+      },
+      {
+        "type": "action",
+        "description": "Click the wallet connection prompt to start connecting a wallet"
+      },
+      {
+        "type": "action",
+        "description": "Complete the in-app wallet connection flow"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the policy settings to finish loading"
+      },
+      {
+        "type": "action",
+        "description": "Fill a negative number into the max spend field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the policy save action"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a field-level validation error is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user remains on the policy form and the save is not completed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC024",
+    "title": "Analytics supports large datasets without UI breakage",
+    "description": "Verifies the analytics dashboard remains navigable and charts remain visible when many sessions are present.",
+    "category": "Analytics Dashboard",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /analytics"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the analytics dashboard content to finish loading"
+      },
+      {
+        "type": "action",
+        "description": "Scroll through the full analytics dashboard"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify all chart sections remain displayed and the page remains responsive to scrolling"
+      }
+    ],
+    "priority": "Low"
+  }
+]

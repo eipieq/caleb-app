@@ -1,0 +1,157 @@
+version: "2"
+type: frontend
+tech_stack:
+  - TypeScript
+  - Next.js 16 (App Router)
+  - React 19
+  - Tailwind CSS
+  - shadcn/ui
+  - Recharts
+  - Liveline
+  - Privy (wallet auth)
+  - viem / wagmi (onchain)
+routes:
+  - path: /
+    file: app/page.tsx
+    auth_required: false
+    description: Home dashboard with agent status, stats, live trade feed, and portfolio summary
+  - path: /sessions/[id]
+    file: app/sessions/[id]/page.tsx
+    auth_required: false
+    description: Session detail page with 5-step audit timeline, verification, and attestations
+  - path: /analytics
+    file: app/analytics/page.tsx
+    auth_required: false
+    description: Analytics dashboard with P&L charts, portfolio value, verdict breakdown, confidence histogram
+  - path: /strategy
+    file: app/strategy/page.tsx
+    auth_required: false
+    description: Strategy/policy configuration page
+  - path: /api/verify/[id]
+    file: app/api/verify/[id]/route.ts
+    auth_required: false
+    description: API proxy for session verification against on-chain data
+  - path: /api/attestations/[id]
+    file: app/api/attestations/[id]/route.ts
+    auth_required: false
+    description: API proxy for fetching session attestations
+features:
+  - name: Live Trade Feed
+    description: Real-time feed of trading sessions with auto-refresh polling, expandable list, and session cards showing verdict, token, confidence, and amount
+    files:
+      - components/home-feed.tsx
+      - components/session-card.tsx
+    entry_route: /
+    user_interactions:
+      - View agent status indicator and stats bar
+      - Browse session cards in the trade feed
+      - Click "show more" to expand feed and reveal older sessions
+      - Click a session card to navigate to session detail
+    api_calls:
+      - method: GET
+        endpoint: /api/sessions?limit=50
+    auth_required: false
+  - name: Portfolio Summary
+    description: Portfolio value, P&L, holdings, and trade history displayed on the home page
+    files:
+      - components/home-feed.tsx
+    entry_route: /
+    user_interactions:
+      - View portfolio value card with total value and P&L
+      - View trade history entries with token, side, amount, and P&L
+      - Click trade proof links to navigate to session detail
+    api_calls:
+      - method: GET
+        endpoint: /api/portfolio
+    auth_required: false
+  - name: Session Detail and Audit Timeline
+    description: Detailed view of a trading session with 5-step audit timeline (Policy, Market, Decision, Check, Execution), expandable steps with reasoning and raw JSON
+    files:
+      - app/sessions/[id]/page.tsx
+      - components/session-detail.tsx
+    entry_route: /sessions/[id]
+    user_interactions:
+      - View session metadata (ID, timestamp, verdict)
+      - Expand/collapse each audit step to see reasoning
+      - View raw JSON payload via disclosure
+      - Copy step hash to clipboard
+      - Navigate back to feed
+    api_calls:
+      - method: GET
+        endpoint: /api/sessions/{id}
+    auth_required: false
+  - name: On-chain Verification
+    description: Verify session data against on-chain records, showing per-step hash match/mismatch badges
+    files:
+      - components/session-detail.tsx
+    entry_route: /sessions/[id]
+    user_interactions:
+      - Click "Verify on-chain" button
+      - View per-step verification badges (match/mismatch)
+    api_calls:
+      - method: GET
+        endpoint: /api/verify/{id}
+    auth_required: false
+  - name: Attestations
+    description: View and submit attestations for trading sessions, requires wallet connection
+    files:
+      - components/session-detail.tsx
+    entry_route: /sessions/[id]
+    user_interactions:
+      - View attestation count and list
+      - Click attest button (requires wallet)
+      - See connect wallet prompt if not connected
+    api_calls:
+      - method: GET
+        endpoint: /api/attestations/{id}
+    auth_required: false
+  - name: Wallet Connection
+    description: Connect/disconnect crypto wallet via Privy, displays address and INIT balance
+    files:
+      - components/wallet-button.tsx
+      - components/providers.tsx
+    entry_route: /
+    user_interactions:
+      - Click "Connect Wallet" button in header
+      - See wallet address and INIT balance after connecting
+      - Disconnect wallet to return to guest state
+    api_calls: []
+    auth_required: false
+  - name: Analytics Dashboard
+    description: Portfolio analytics with cumulative P&L chart, portfolio value chart, verdict distribution pie chart, and confidence histogram
+    files:
+      - app/analytics/page.tsx
+      - components/analytics-dashboard.tsx
+    entry_route: /analytics
+    user_interactions:
+      - View stat cards (total P&L, portfolio value, win rate, trades)
+      - View cumulative P&L liveline chart
+      - View portfolio value liveline chart
+      - View decision breakdown pie chart
+      - View confidence distribution bar chart
+    api_calls:
+      - method: GET
+        endpoint: /api/sessions?limit=200
+      - method: GET
+        endpoint: /api/portfolio
+    auth_required: false
+  - name: Strategy Configuration
+    description: View and edit agent trading policy (max spend, confidence threshold, cooldown, allowed tokens)
+    files:
+      - app/strategy/page.tsx
+      - components/strategy-editor.tsx
+    entry_route: /strategy
+    user_interactions:
+      - View current policy settings
+      - Edit policy fields
+      - Save updated policy
+    api_calls:
+      - method: GET
+        endpoint: /api/policy
+      - method: POST
+        endpoint: /api/policy
+    auth_required: false
+known_limitations:
+  - issue: Truncated session hashes displayed in feed UI may confuse users or bots into constructing partial URLs
+    location: components/session-card.tsx
+    impact: Session detail lookup now supports prefix matching as fallback, redirecting to full hash URL
