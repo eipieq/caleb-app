@@ -134,8 +134,8 @@ export function SessionDetail({ session }: { session: Session }) {
         Back
       </Button>
 
-      {/* chain commit failed banner */}
-      {(session as any).committed === false && (
+      {/* chain commit failed banner — hide if verification already passed */}
+      {(session as any).committed === false && !result?.allPassed && (
         <div className="mb-4 flex items-start gap-2 rounded-lg border border-yellow-500/40 bg-transparent px-4 py-3 text-xs text-yellow-400">
           <AlertTriangleIcon className="size-3.5 mt-0.5 shrink-0" />
           <span className="flex flex-col gap-1">
@@ -199,7 +199,7 @@ export function SessionDetail({ session }: { session: Session }) {
 
               {result?.allPassed && !isConnected && (
                 <Button size="sm" onClick={openConnect}>
-                  Connect wallet to attest
+                  Connect wallet to submit an attestation
                 </Button>
               )}
 
