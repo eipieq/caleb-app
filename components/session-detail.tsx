@@ -38,6 +38,22 @@ export function SessionDetail({ session }: { session: Session }) {
   const [attestTxHash, setAttestTxHash] = useState<string | null>(null);
   const [attestConfirmed, setAttestConfirmed] = useState(false);
   const [attestError, setAttestError] = useState<string | null>(null);
+  const [copiedHash, setCopiedHash] = useState<string | null>(null);
+  const [expandedSteps, setExpandedSteps] = useState<Set<string>>(new Set());
+
+  function copyWithFeedback(text: string, label: string) {
+    navigator.clipboard.writeText(text);
+    setCopiedHash(label);
+    setTimeout(() => setCopiedHash(null), 2000);
+  }
+
+  function toggleStep(kind: string) {
+    setExpandedSteps((prev) => {
+      const next = new Set(prev);
+      if (next.has(kind)) next.delete(kind); else next.add(kind);
+      return next;
+    });
+  }
 
   const decision = session.steps?.find((s) => s.kind === "DECISION");
   const verdict   = (decision?.payload?.verdict as string) ?? "SKIP";
@@ -227,11 +243,14 @@ export function SessionDetail({ session }: { session: Session }) {
             {attestTxHash && (
               <button
                 title={`attestation tx: ${attestTxHash}\n\non caleb-chain — query via RPC at 64.227.139.172:26657`}
-                onClick={() => navigator.clipboard.writeText(attestTxHash)}
+                onClick={() => copyWithFeedback(attestTxHash, "attest-tx")}
                 className="text-xs font-mono text-muted-foreground hover:text-foreground flex items-center gap-1"
               >
-                Attestation tx: {attestTxHash.slice(0, 20)}...
-                <CopyIcon className="size-3" />
+                {copiedHash === "attest-tx" ? (
+                  <><CheckIcon className="size-3 text-green-400" /> Copied to clipboard</>
+                ) : (
+                  <>Attestation tx: {attestTxHash.slice(0, 20)}... <CopyIcon className="size-3" /></>
+                )}
               </button>
             )}
           </CardContent>
@@ -289,33 +308,79 @@ export function SessionDetail({ session }: { session: Session }) {
           <div className="flex flex-col gap-3">
             {session.steps?.map((step, i) => {
               const verified = result?.steps?.[i];
+              const isExpanded = expandedSteps.has(step.kind);
               return (
-                <div key={step.kind} className="flex items-center gap-4">
-                  <Badge variant="outline" className="w-24 justify-center shrink-0">
-                    {STEP_LABELS[step.kind] ?? step.kind}
-                  </Badge>
-
-                  <span className="font-mono text-xs text-muted-foreground truncate flex-1 min-w-0">
-                    {step.hash}
-                  </span>
-
-                  {verified && (
-                    <Badge variant={verified.match ? "default" : "destructive"}>
-                      {verified.match ? <CheckIcon /> : <XIcon />}
+                <div key={step.kind} className="flex flex-col">
+                  <button
+                    onClick={() => toggleStep(step.kind)}
+                    className="flex items-center gap-4 w-full text-left hover:bg-accent/30 rounded-lg px-2 py-1.5 -mx-2 transition-colors"
+                  >
+                    <Badge variant="outline" className="w-24 justify-center shrink-0">
+                      {STEP_LABELS[step.kind] ?? step.kind}
                     </Badge>
-                  )}
 
-                  {step.txHash ? (
-                    <button
-                      title={`tx: ${step.txHash}\n\non caleb-chain — query via RPC at 64.227.139.172:26657`}
-                      onClick={() => navigator.clipboard.writeText(step.txHash)}
-                      className="flex items-center gap-1 font-mono text-xs text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      {step.txHash.slice(0, 8)}...
-                      <CopyIcon className="size-3" />
-                    </button>
-                  ) : (
-                    <span className="font-mono text-xs text-muted-foreground/40">no tx</span>
+                    <span className="font-mono text-xs text-muted-foreground truncate flex-1 min-w-0">
+                      {step.hash}
+                    </span>
+
+                    {verified && (
+                      <Badge variant={verified.match ? "default" : "destructive"}>
+                        {verified.match ? <CheckIcon /> : <XIcon />}
+                      </Badge>
+                    )}
+
+                    <span className="text-xs text-muted-foreground/50 shrink-0">{isExpanded ? "▾" : "▸"}</span>
+                  </button>
+
+                  {isExpanded && (
+                    <div className="ml-28 mt-2 mb-3 flex flex-col gap-2 text-xs">
+                      {step.payload && (
+                        <div className="text-sm text-muted-foreground leading-relaxed">
+                          {typeof step.payload === "object" && (step.payload as Record<string, unknown>).reasoning
+                            ? <p>{(step.payload as Record<string, unknown>).reasoning as string}</p>
+                            : <p className="text-muted-foreground/60">No reasoning available for this step.</p>
+                          }
+                        </div>
+                      )}
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); copyWithFeedback(step.hash, `hash-${step.kind}`); }}
+                          className="flex items-center gap-1 font-mono text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          {copiedHash === `hash-${step.kind}` ? (
+                            <><CheckIcon className="size-3 text-green-400" /> Copied to clipboard</>
+                          ) : (
+                            <><CopyIcon className="size-3" /> Copy hash</>
+                          )}
+                        </button>
+                      </div>
+
+                      {step.txHash ? (
+                        <button
+                          title={`tx: ${step.txHash}\n\non caleb-chain — query via RPC at 64.227.139.172:26657`}
+                          onClick={(e) => { e.stopPropagation(); copyWithFeedback(step.txHash, `tx-${step.kind}`); }}
+                          className="flex items-center gap-1 font-mono text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          {copiedHash === `tx-${step.kind}` ? (
+                            <><CheckIcon className="size-3 text-green-400" /> Copied to clipboard</>
+                          ) : (
+                            <>tx: {step.txHash.slice(0, 8)}... <CopyIcon className="size-3" /></>
+                          )}
+                        </button>
+                      ) : (
+                        <span className="font-mono text-muted-foreground/40">no tx</span>
+                      )}
+
+                      <details className="mt-1">
+                        <summary className="cursor-pointer text-muted-foreground hover:text-foreground transition-colors select-none">
+                          Raw JSON
+                        </summary>
+                        <pre className="mt-2 p-3 bg-muted rounded-lg overflow-auto text-muted-foreground leading-relaxed">
+                          {JSON.stringify(step.payload, null, 2)}
+                        </pre>
+                      </details>
+                    </div>
                   )}
                 </div>
               );
