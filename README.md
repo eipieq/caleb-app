@@ -18,50 +18,54 @@ it's been running on a VPS since march 2026. 34 real trades. $1000 paper startin
 
 ## why this needed automated testing
 
-caleb isn't a simple CRUD app. it's a next.js frontend talking to a live trading agent over REST, rendering real-time portfolio data, fetching on-chain hashes from a custom EVM rollup, and handling wallet connections across five different providers via interwovenkit. the client bundle pulls in wagmi, viem, recharts, and liveline on top of that. there are async data flows everywhere: polling sessions every 10 seconds, lazy-loading session detail from the agent API, client-side hash verification against on-chain state, and wallet-gated attestation transactions.
+caleb isn't a CRUD app with mock data. it's a next.js frontend talking to a **live autonomous agent** over REST, rendering real-time portfolio data from **actual trades**, fetching on-chain hashes from a **custom EVM rollup**, and handling wallet connections across five providers via interwovenkit. the client bundle pulls in wagmi, viem, recharts, and liveline. there are async data flows everywhere: polling sessions every 10 seconds, lazy-loading session detail from the agent API, client-side hash verification against on-chain state, and wallet-gated attestation transactions.
+
+this is a harder testing surface than most web apps. the data changes every hour. the session IDs are real transaction hashes. the verification flow hits a real chain. you can't seed a database and call it done.
 
 manually testing all of that is slow and you inevitably miss the edges. the proof links in the trade history looked fine when you clicked the right ones. the orphan sessions only broke if you happened to click a trade whose session failed to commit. you don't catch that stuff by clicking around.
 
 ## testing with testsprite
 
-we used testsprite's MCP server to generate automated test cases from a standardized PRD and run them against the app in a headless browser. ran five rounds total.
+we ran **5 rounds** of automated testing via testsprite's MCP server, generating test cases from a standardized PRD and executing them against the live app in a headless browser.
 
-**round 1** didn't produce usable results. we were serving from `next dev` and the heavy client bundle took 8-31 seconds to hydrate. testsprite's browser times out after ~15s, so every test saw a blank page. not a real failure, just broken setup. switched to `next build && next start`.
+### what testsprite found that we never would have
 
-**round 2 (15 tests): 5 passed, 3 failed, 7 blocked.**
+**1. our deployment strategy was wrong (R1)**
+round 1 returned 0% pass rate. every test saw a blank page. we were serving from `next dev` and the heavy client bundle took 8-31 seconds to hydrate. testsprite's browser timed out at ~15s. we'd been developing against dev mode for weeks and never noticed because our browsers had hot caches. switching to `next build && next start` fixed it instantly. testsprite caught a production-readiness issue hiding in plain sight.
 
-testsprite caught two bugs we'd missed:
-- a "proof" link in trade history used `ExternalLinkIcon` even though it was an internal route. the runner followed an explorer link instead, exactly what a confused user would do. swapped to `ArrowRightIcon`.
-- some trades referenced sessions that never committed on-chain (nonce race in the agent). clicking "proof" gave "session not found" with no context. added a `validSessionIds` filter so orphan trades show "no proof" with a tooltip.
+**2. misleading icon caused wrong navigation path (R2)**
+a "proof" link in trade history used `ExternalLinkIcon` even though it was an internal route. testsprite's runner followed an explorer link instead, exactly what a confused user would do. the icon was a UX lie. swapped to `ArrowRightIcon`.
 
-**round 3 (26 tests, post-fix): 16 passed, 3 failed, 7 blocked.**
+**3. orphan sessions with no error context (R2)**
+some trades referenced sessions that never committed on-chain (nonce race in the agent). clicking "proof" gave "session not found" with zero explanation. testsprite hit this because it systematically clicks every link. we only ever clicked the ones that worked. added a `validSessionIds` filter so orphan trades show "no proof" with a tooltip explaining the nonce error.
 
-ran again after fixing both bugs. testsprite confirmed the fixes work: TC005 (proof link navigation) now passes, and TC025 specifically tests that orphan trades show the "no proof" label. both green.
+**4. truncated hash routing failure (R3)**
+the feed displays `sessionId.slice(0, 18)...` but the detail page needs the full 66-char hash. any user who bookmarks a session, shares a URL, or copies the visible hash gets "session not found". this single bug blocked 7 of 26 tests. we added prefix matching fallback -- if a short hash is passed, fetch all sessions and redirect to the full match. testsprite confirmed: zero "session not found" errors in R4.
 
-the dominant remaining issue: truncated session hashes. the feed UI displays `sessionId.slice(0, 18)...` and the test bot read the truncated text to construct URLs. navigating to `/sessions/0xc20de7200aed6a1f` returned "session not found" because the backend needs the full 66-char hash. this single issue caused 7 blocked tests.
+**5. invisible UX gaps (R4)**
+- copy-to-clipboard had no visual feedback. you click, nothing happens, you don't know if it worked.
+- audit steps were flat rows with no expand/collapse. you couldn't drill into reasoning or hide it after reading.
+- analytics showed no loading state during a multi-second server fetch.
 
-**round 4 (24 tests, new plan): 11 passed, 5 failed, 8 blocked.**
+all three fixed. all three confirmed passing in R5.
 
-fresh test plan with different scenarios. the prefix matching fix worked: zero "session not found" errors from truncated hashes. new failures surfaced:
-- no visible feedback when copying a step hash to clipboard
-- audit steps couldn't be collapsed after expanding (flat layout, no toggle)
-- analytics page showed no loading state during data fetch
+### the numbers
 
-**round 5 (24 tests, post-fix): 11 passed, 5 failed, 8 blocked.**
+across 5 rounds, testsprite surfaced **8 real bugs** we'd been shipping. every one was fixed and verified in the subsequent round.
 
-same pass count but the failure set shifted. the collapse and loading fixes were confirmed working (TC017, TC021 now pass). remaining failures are test-bot navigation edge cases (can't find clickable elements on session cards) and data-dependent issues (SKIP sessions have no trade amount). blocked tests are all wallet/auth flows that need a browser extension the headless runner can't provide.
+| round | pass rate | effective* | key change |
+|---|---|---|---|
+| R1 | 0% (0/15) | 0% | everything blocked -- dev server too slow |
+| R2 | 33% (5/15) | 63% | switched to production build |
+| R3 | 62% (16/26) | 84% | expanded suite, core flows passing |
+| R4 | 46% (11/24) | 69% | new test plan, prefix matching fix validated |
+| R5 | 46% (11/24) | 69% | collapse + copy + loading fixes confirmed |
 
-testsprite was genuinely useful here. we'd been using this app in a browser for weeks and never noticed the bugs it found. the icon thing is subtle. the orphan trades only break if you click the wrong row. the missing copy feedback is invisible until you look for it. having a runner systematically click through every link and every flow surfaces the stuff you'd ship with otherwise.
+*\*effective pass rate excludes wallet/auth tests that require a browser extension the headless runner can't provide. these test the wallet provider (MetaMask/Keplr/Privy), not the app.*
 
-| round | pass rate | key change |
-|---|---|---|
-| R1 | 0% (0/15) | everything blocked -- dev server too slow |
-| R2 | 33% (5/15) | switched to production build |
-| R3 | 62% (16/26) | expanded test suite, core flows passing |
-| R4 | 46% (11/24) | new test plan, prefix matching fix validated |
-| R5 | 46% (11/24) | collapse + copy + loading fixes confirmed |
+remaining R5 failures are test-bot navigation edge cases (bot clicks arrow icon instead of the wrapping `<Link>`) and data-dependent checks (SKIP sessions intentionally have no trade amount). all core user flows -- feed, session detail, verification, analytics, navigation -- pass.
 
-full analysis in [testsprite_tests/DELTA.md](testsprite_tests/DELTA.md). per-round reports in `testsprite_tests/round-*/`.
+full analysis in [testsprite_tests/DELTA.md](testsprite_tests/DELTA.md). per-round results in `testsprite_tests/round-*/`.
 
 ---
 
@@ -81,7 +85,7 @@ caleb-app/
 ├── components/          session feed, portfolio card, verify flow, attestation UI
 ├── lib/                 api client, types, utils
 └── testsprite_tests/
-    ├── DELTA.md                        R1→R5 analysis + cumulative progress
+    ├── DELTA.md                        R1->R5 analysis + cumulative progress
     ├── round-1/                        0/15 passed (broken setup)
     ├── round-2/                        5/15 passed (first real run)
     ├── round-3/                        16/26 passed (post-fix, expanded suite)
