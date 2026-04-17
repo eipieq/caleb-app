@@ -14,8 +14,8 @@ import {
 import InterwovenKitStyles from "@initia/interwovenkit-react/styles.js";
 import { CHAIN_ID, EVM_CHAIN_ID, EVM_RPC, TESTNET_EVM_RPC, TESTNET_EVM_CHAIN_ID } from "@/lib/config";
 
-// on the server (SSR) we need absolute URLs; in the browser relative paths work
-const origin = typeof window !== "undefined" ? "" : (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000");
+// need absolute URLs — wallet SDKs parse with new URL() which rejects relative paths
+const origin = typeof window !== "undefined" ? window.location.origin : (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000");
 const PROXY_RPC = `${origin}/api/chain-rpc`;
 const PROXY_REST = `${origin}/api/chain-rest`;
 const PROXY_EVM = `${origin}/api/chain-evm`;
