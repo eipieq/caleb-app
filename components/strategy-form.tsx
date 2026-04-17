@@ -16,7 +16,7 @@ import Image from "next/image";
 import { CheckIcon } from "lucide-react";
 
 const ALL_TOKENS = ["INIT", "ETH", "USDC"];
-const ALL_STRATEGIES = ["momentum", "mean-revert"];
+const ALL_STRATEGIES = ["momentum", "mean-revert", "scalper"];
 
 const DEFAULT: Policy = {
   maxSpendUsd: 50,
@@ -125,6 +125,9 @@ export function StrategyForm({ initialPolicy }: { initialPolicy: Policy | null }
                   </ToggleGroupItem>
                 ))}
               </ToggleGroup>
+              {policy.strategy === "scalper" && (
+                <p className="text-xs text-muted-foreground/60 mt-1">AI override disabled — micro-moves get vetoed every time</p>
+              )}
             </Field>
 
             <Field orientation="horizontal">
