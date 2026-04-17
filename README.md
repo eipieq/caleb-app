@@ -24,7 +24,7 @@ manually testing all of that is slow and you inevitably miss the edges. the proo
 
 ## testing with testsprite
 
-we used testsprite's MCP server to generate automated test cases from a standardized PRD and run them against the app in a headless browser. ran three rounds total.
+we used testsprite's MCP server to generate automated test cases from a standardized PRD and run them against the app in a headless browser. ran five rounds total.
 
 **round 1** didn't produce usable results. we were serving from `next dev` and the heavy client bundle took 8-31 seconds to hydrate. testsprite's browser times out after ~15s, so every test saw a blank page. not a real failure, just broken setup. switched to `next build && next start`.
 
@@ -38,11 +38,28 @@ testsprite caught two bugs we'd missed:
 
 ran again after fixing both bugs. testsprite confirmed the fixes work: TC005 (proof link navigation) now passes, and TC025 specifically tests that orphan trades show the "no proof" label. both green.
 
-the new failures are interesting too. the verdict distribution chart shows a single "SKIP" slice because the agent skips ~83% of its cycles. technically correct data but visually looks broken. the confidence histogram has the same problem: one fat bar. these are data-skew UX issues, not rendering bugs.
+the dominant remaining issue: truncated session hashes. the feed UI displays `sessionId.slice(0, 18)...` and the test bot read the truncated text to construct URLs. navigating to `/sessions/0xc20de7200aed6a1f` returned "session not found" because the backend needs the full 66-char hash. this single issue caused 7 blocked tests.
 
-the blocked tests mostly hit orphan session IDs where the runner navigated to a session that didn't commit on-chain. a few need a browser wallet extension that headless runners can't provide.
+**round 4 (24 tests, new plan): 11 passed, 5 failed, 8 blocked.**
 
-testsprite was genuinely useful here. we'd been using this app in a browser for weeks and never noticed either bug it found. the icon thing is subtle. the orphan trades only break if you click the wrong row. having a runner systematically click through every link and every flow surfaces the stuff you'd ship with otherwise.
+fresh test plan with different scenarios. the prefix matching fix worked: zero "session not found" errors from truncated hashes. new failures surfaced:
+- no visible feedback when copying a step hash to clipboard
+- audit steps couldn't be collapsed after expanding (flat layout, no toggle)
+- analytics page showed no loading state during data fetch
+
+**round 5 (24 tests, post-fix): 11 passed, 5 failed, 8 blocked.**
+
+same pass count but the failure set shifted. the collapse and loading fixes were confirmed working (TC017, TC021 now pass). remaining failures are test-bot navigation edge cases (can't find clickable elements on session cards) and data-dependent issues (SKIP sessions have no trade amount). blocked tests are all wallet/auth flows that need a browser extension the headless runner can't provide.
+
+testsprite was genuinely useful here. we'd been using this app in a browser for weeks and never noticed the bugs it found. the icon thing is subtle. the orphan trades only break if you click the wrong row. the missing copy feedback is invisible until you look for it. having a runner systematically click through every link and every flow surfaces the stuff you'd ship with otherwise.
+
+| round | pass rate | key change |
+|---|---|---|
+| R1 | 0% (0/15) | everything blocked -- dev server too slow |
+| R2 | 33% (5/15) | switched to production build |
+| R3 | 62% (16/26) | expanded test suite, core flows passing |
+| R4 | 46% (11/24) | new test plan, prefix matching fix validated |
+| R5 | 46% (11/24) | collapse + copy + loading fixes confirmed |
 
 full analysis in [testsprite_tests/DELTA.md](testsprite_tests/DELTA.md). per-round reports in `testsprite_tests/round-*/`.
 
@@ -64,11 +81,12 @@ caleb-app/
 ├── components/          session feed, portfolio card, verify flow, attestation UI
 ├── lib/                 api client, types, utils
 └── testsprite_tests/
-    ├── testsprite-mcp-test-report.md   canonical combined report
-    ├── DELTA.md                        R1→R2 analysis
+    ├── DELTA.md                        R1→R5 analysis + cumulative progress
     ├── round-1/                        0/15 passed (broken setup)
     ├── round-2/                        5/15 passed (first real run)
-    └── round-3/                        16/26 passed (post-fix)
+    ├── round-3/                        16/26 passed (post-fix, expanded suite)
+    ├── round-4/                        11/24 passed (new plan, prefix fix validated)
+    └── round-5/                        11/24 passed (collapse + copy + loading fixes)
 ```
 
 next.js app router convention, so code lives in `app/`, `components/`, `lib/` instead of `src/`.
