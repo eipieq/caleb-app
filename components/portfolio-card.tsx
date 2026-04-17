@@ -1,10 +1,9 @@
 import Link from "next/link";
-import { ExternalLinkIcon, TrendingUpIcon, TrendingDownIcon } from "lucide-react";
+import { ArrowRightIcon, TrendingUpIcon, TrendingDownIcon } from "lucide-react";
 import type { Portfolio } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { EXPLORER_TX } from "@/lib/config";
 import { cn } from "@/lib/utils";
 
 function pnlColor(n: number) {
@@ -16,12 +15,13 @@ function fmt(n: number, prefix = "$") {
   return `${sign}${prefix}${Math.abs(n).toFixed(2)}`;
 }
 
-export function PortfolioCard({ portfolio }: { portfolio: Portfolio }) {
+export function PortfolioCard({ portfolio, validSessionIds }: { portfolio: Portfolio; validSessionIds?: Set<string> }) {
   const { totalValueUsd, totalPnlUsd, totalPnlPct, startingBalanceUsd, usdcBalance,
           holdings, realisedPnlUsd, unrealisedPnlUsd, tradesTotal, winningTrades,
           losingTrades, tradeHistory } = portfolio;
 
-  const winRate = tradesTotal > 0 ? Math.round((winningTrades / (winningTrades + losingTrades || 1)) * 100) : null;
+  const closedTrades = winningTrades + losingTrades;
+  const winRate = closedTrades > 0 ? Math.round((winningTrades / closedTrades) * 100) : null;
   const isUp    = totalPnlUsd >= 0;
 
   return (
@@ -60,7 +60,7 @@ export function PortfolioCard({ portfolio }: { portfolio: Portfolio }) {
 
         {/* Trade stats */}
         <div className="grid grid-cols-3 gap-4 text-center">
-          <Stat label="Total trades" value={String(tradesTotal)} />
+          <Stat label="Total trades" value={`${closedTrades} closed`} />
           <Stat label="Win / Loss" value={`${winningTrades} / ${losingTrades}`} />
           <Stat label="Win rate" value={winRate !== null ? `${winRate}%` : "—"} color={winRate !== null ? (winRate >= 50 ? "text-green-600" : "text-red-500") : undefined} />
         </div>
@@ -112,13 +112,20 @@ export function PortfolioCard({ portfolio }: { portfolio: Portfolio }) {
                         {fmt(t.pnlUsd)}
                       </span>
                     )}
-                    {t.sessionId && t.sessionId !== "pending" && (
+                    {t.sessionId && t.sessionId !== "pending" && (!validSessionIds || validSessionIds.has(t.sessionId)) ? (
                       <Link
                         href={`/sessions/${t.sessionId}`}
                         className="text-muted-foreground/50 hover:text-muted-foreground transition-colors flex items-center gap-0.5"
                       >
-                        proof <ExternalLinkIcon className="size-3" />
+                        proof <ArrowRightIcon className="size-3" />
                       </Link>
+                    ) : (
+                      <span
+                        title="audit trail unavailable — session did not commit on-chain"
+                        className="text-muted-foreground/30 text-[10px]"
+                      >
+                        no proof
+                      </span>
                     )}
                     <span className="text-muted-foreground/40">
                       {new Date(t.timestamp * 1000).toLocaleTimeString()}

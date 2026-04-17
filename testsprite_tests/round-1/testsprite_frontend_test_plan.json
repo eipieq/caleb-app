@@ -1,0 +1,477 @@
+[
+  {
+    "id": "TC001",
+    "title": "Browse live trade feed and open a session detail",
+    "description": "Verifies a guest can load the home feed with session cards, status and stats, then open a session detail view from the feed.",
+    "category": "Trade Feed",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the feed to finish loading"
+      },
+      {
+        "type": "action",
+        "description": "Click a session card in the feed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the session detail view is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the 5-step audit timeline is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC002",
+    "title": "Guest can monitor trade feed and open a session detail",
+    "description": "Verifies that a guest can load the home feed and navigate into a session detail view successfully.",
+    "category": "Wallet Connection and Balance",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the home feed to finish loading"
+      },
+      {
+        "type": "action",
+        "description": "Click a session card in the feed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the session detail view is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the 5-step audit timeline is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC003",
+    "title": "Run on-chain verification and view per-step results",
+    "description": "Verifies a user can initiate on-chain verification for a session and see per-step verification result badges displayed.",
+    "category": "Session Detail and Verification",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the feed to finish loading"
+      },
+      {
+        "type": "action",
+        "description": "Click a session card in the feed"
+      },
+      {
+        "type": "action",
+        "description": "Initiate on-chain verification for the session"
+      },
+      {
+        "type": "action",
+        "description": "Wait for verification to finish"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify per-step verification result badges are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an overall verification status is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC004",
+    "title": "Feed shows skeleton then populates from cache and refreshes",
+    "description": "Verifies the home feed shows a loading skeleton initially and then displays sessions once data is available.",
+    "category": "Trade Feed",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the initial loading state to appear"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the feed to finish loading"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify session cards are displayed in the feed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the stats bar and portfolio summary are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC005",
+    "title": "Inspect audit timeline, reasoning, and raw JSON on a session",
+    "description": "Verifies a guest can expand a timeline step to view reasoning and confidence and expand raw session JSON for inspection.",
+    "category": "Session Detail and Verification",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the feed to finish loading"
+      },
+      {
+        "type": "action",
+        "description": "Click a session card in the feed"
+      },
+      {
+        "type": "action",
+        "description": "Expand one audit step in the timeline"
+      },
+      {
+        "type": "action",
+        "description": "Expand the raw session JSON section"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify expanded step details are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify raw session JSON content is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC006",
+    "title": "Agent status and portfolio summary are visible on home",
+    "description": "Verifies the home page surfaces the agent online/offline indicator and portfolio summary alongside the feed.",
+    "category": "Trade Feed",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the feed to finish loading"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an agent online/offline status indicator is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a portfolio summary section is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC007",
+    "title": "Open session detail and return to feed",
+    "description": "Verifies a guest can navigate from the feed into a session detail view and then return to the feed without losing the ability to browse sessions.",
+    "category": "Trade Feed",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the feed to finish loading"
+      },
+      {
+        "type": "action",
+        "description": "Click a session card in the feed"
+      },
+      {
+        "type": "action",
+        "description": "Click the back navigation control in the session detail view"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the trade feed is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify session cards are displayed in the feed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC008",
+    "title": "Guest can connect wallet and see address plus INIT balance on home",
+    "description": "Verifies that a user can connect an Initia wallet and then see their address in navigation and an INIT balance card on the home page.",
+    "category": "Wallet Connection and Balance",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Initiate wallet connection from the top navigation"
+      },
+      {
+        "type": "action",
+        "description": "Complete wallet connection in the wallet modal"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the connected wallet address is displayed in the navigation area"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the INIT balance card is displayed on the home page"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC009",
+    "title": "Verification results persist while expanding and collapsing steps",
+    "description": "Verifies verification status remains visible and consistent while the user expands and collapses timeline steps.",
+    "category": "Session Detail and Verification",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the feed to finish loading"
+      },
+      {
+        "type": "action",
+        "description": "Click a session card in the feed"
+      },
+      {
+        "type": "action",
+        "description": "Initiate on-chain verification for the session"
+      },
+      {
+        "type": "action",
+        "description": "Wait for verification to finish"
+      },
+      {
+        "type": "action",
+        "description": "Expand an audit step in the timeline"
+      },
+      {
+        "type": "action",
+        "description": "Collapse the expanded audit step"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify per-step verification result badges are still displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the verification status remains displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC010",
+    "title": "Attestations list is displayed on session detail",
+    "description": "Verifies the session detail view shows a list of attestations (or an empty state) for the session.",
+    "category": "Session Detail and Verification",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the feed to finish loading"
+      },
+      {
+        "type": "action",
+        "description": "Click a session card in the feed"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the attestations section"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an attestations list or empty state is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC011",
+    "title": "Feed refreshes via polling without breaking the session list",
+    "description": "Verifies the feed continues to display sessions after a polling interval refresh.",
+    "category": "Trade Feed",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the feed to finish loading"
+      },
+      {
+        "type": "action",
+        "description": "Wait for 12 seconds"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify session cards are still displayed in the feed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the page remains interactive for selecting a session"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC012",
+    "title": "Copy a step hash from session detail",
+    "description": "Verifies a guest can copy a transaction hash from a timeline step and receives a visible confirmation of the copy action.",
+    "category": "Session Detail and Verification",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the feed to finish loading"
+      },
+      {
+        "type": "action",
+        "description": "Click a session card in the feed"
+      },
+      {
+        "type": "action",
+        "description": "Expand one audit step in the timeline"
+      },
+      {
+        "type": "action",
+        "description": "Trigger the copy-hash action for that step"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a copy confirmation is visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC013",
+    "title": "Wallet connect is accessible from non-home pages and persists when navigating",
+    "description": "Verifies that connecting a wallet from another page persists and is still shown when returning to home.",
+    "category": "Wallet Connection and Balance",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /analytics"
+      },
+      {
+        "type": "action",
+        "description": "Initiate wallet connection from the top navigation"
+      },
+      {
+        "type": "action",
+        "description": "Complete wallet connection in the wallet modal"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation link to go to the home page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the connected wallet address is displayed in the navigation area"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the INIT balance card is displayed on the home page"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC014",
+    "title": "Disconnecting wallet returns UI to guest state on home",
+    "description": "Verifies that a connected user can disconnect and the UI returns to the guest state without showing address/balance.",
+    "category": "Wallet Connection and Balance",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Initiate wallet connection from the top navigation"
+      },
+      {
+        "type": "action",
+        "description": "Complete wallet connection in the wallet modal"
+      },
+      {
+        "type": "action",
+        "description": "Open the wallet menu from the navigation area"
+      },
+      {
+        "type": "action",
+        "description": "Disconnect the wallet"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the navigation shows the disconnected state instead of a wallet address"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the INIT balance card is not displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC015",
+    "title": "Home page shows a clear connect prompt when wallet-required actions are available",
+    "description": "Verifies that when not connected, the home page presents a clear wallet connection call-to-action for wallet-required functionality.",
+    "category": "Wallet Connection and Balance",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the home feed to finish loading"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a connect wallet call-to-action is visible on the page"
+      }
+    ],
+    "priority": "Low"
+  }
+]

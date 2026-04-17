@@ -1,17 +1,17 @@
 "use client";
 
+import { Liveline } from "liveline";
 import {
-  LineChart, Line, AreaChart, Area,
   BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
 import type { Portfolio, Session } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-const GREEN  = "hsl(142 71% 45%)";
-const RED    = "hsl(0 72% 51%)";
+const GREEN  = "#22c55e";
+const RED    = "#ef4444";
 const MUTED  = "hsl(240 5% 34%)";
-const ACCENT = "hsl(217 91% 60%)";
+const ACCENT = "#3b82f6";
 
 function fmt(n: number, prefix = "$") {
   return `${prefix}${Math.abs(n).toFixed(2)}`;
@@ -30,35 +30,28 @@ function StatCard({ label, value, sub }: { label: string; value: string; sub?: s
 }
 
 export function AnalyticsDashboard({ portfolio, sessions }: { portfolio: Portfolio; sessions: Session[] }) {
-  // P&L over time — cumulative realized P&L, with a final "now" point including unrealized
-  const pnlData = (() => {
-    let cumulative = 0;
-    const points = portfolio.tradeHistory
+  // cumulative P&L points
+  const pnlPoints = (() => {
+    let cum = 0;
+    const pts = portfolio.tradeHistory
       .filter((t) => t.pnlUsd !== null)
       .map((t) => {
-        cumulative += t.pnlUsd ?? 0;
-        return {
-          date: new Date(t.timestamp * 1000).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-          pnl: parseFloat(cumulative.toFixed(4)),
-        };
+        cum += t.pnlUsd ?? 0;
+        return { time: t.timestamp, value: parseFloat(cum.toFixed(4)) };
       });
-    // append current total (includes unrealized gains from open positions)
-    if (Math.abs(portfolio.totalPnlUsd - cumulative) > 0.01) {
-      points.push({ date: "now", pnl: parseFloat(portfolio.totalPnlUsd.toFixed(4)) });
+    // include unrealized
+    if (Math.abs(portfolio.totalPnlUsd - cum) > 0.01) {
+      pts.push({ time: Math.floor(Date.now() / 1000), value: parseFloat(portfolio.totalPnlUsd.toFixed(4)) });
     }
-    return points;
+    return pts;
   })();
 
-  // portfolio value over time — starting balance + cumulative realized P&L
-  // (usdcBalanceAfter alone dips on BUY trades since USDC was spent on the asset)
-  const valueData = (() => {
-    let cumPnl = 0;
+  // portfolio value points
+  const valuePoints = (() => {
+    let cum = 0;
     return portfolio.tradeHistory.map((t) => {
-      cumPnl += t.pnlUsd ?? 0;
-      return {
-        date: new Date(t.timestamp * 1000).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-        value: parseFloat((portfolio.startingBalanceUsd + cumPnl).toFixed(2)),
-      };
+      cum += t.pnlUsd ?? 0;
+      return { time: t.timestamp, value: parseFloat((portfolio.startingBalanceUsd + cum).toFixed(2)) };
     });
   })();
 
@@ -77,7 +70,7 @@ export function AnalyticsDashboard({ portfolio, sessions }: { portfolio: Portfol
     { name: "SKIP", value: verdictCounts["SKIP"] ?? 0, color: MUTED },
   ].filter((d) => d.value > 0);
 
-  // confidence distribution (buckets 0.1 wide)
+  // confidence distribution
   const confBuckets: Record<string, number> = {};
   sessions.forEach((s) => {
     const c = s.steps?.find((st) => st.kind === "DECISION")?.payload?.confidence as number ?? s.confidence;
@@ -89,12 +82,18 @@ export function AnalyticsDashboard({ portfolio, sessions }: { portfolio: Portfol
     .sort(([a], [b]) => parseFloat(a) - parseFloat(b))
     .map(([k, v]) => ({ range: k, count: v }));
 
-  const winRate = portfolio.tradesTotal > 0
-    ? ((portfolio.winningTrades / portfolio.tradesTotal) * 100).toFixed(1)
-    : "—";
-
+  const closedTrades = portfolio.winningTrades + portfolio.losingTrades;
+  const winRate = closedTrades > 0 ? ((portfolio.winningTrades / closedTrades) * 100).toFixed(1) : "—";
+  const pnlSign = portfolio.totalPnlUsd >= 0 ? "+" : "-";
   const pnlColor = portfolio.totalPnlUsd >= 0 ? GREEN : RED;
-  const pnlSign  = portfolio.totalPnlUsd >= 0 ? "+" : "-";
+
+  const currentPnl = pnlPoints[pnlPoints.length - 1]?.value ?? 0;
+  const currentValue = valuePoints[valuePoints.length - 1]?.value ?? portfolio.totalValueUsd;
+
+  // time range for the window — span of all trade history
+  const timeSpan = portfolio.tradeHistory.length > 1
+    ? portfolio.tradeHistory[portfolio.tradeHistory.length - 1].timestamp - portfolio.tradeHistory[0].timestamp + 3600
+    : 86400;
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-8 flex flex-col gap-6">
@@ -121,59 +120,64 @@ export function AnalyticsDashboard({ portfolio, sessions }: { portfolio: Portfol
         />
         <StatCard
           label="trades"
-          value={String(portfolio.tradesTotal)}
+          value={`${closedTrades} closed`}
           sub={`${sessions.length} sessions`}
         />
       </div>
 
-      {/* cumulative P&L */}
-      {pnlData.length > 0 && (
-        <Card>
-          <CardHeader className="pb-2">
+      {/* cumulative P&L — liveline */}
+      {pnlPoints.length > 0 && (
+        <Card className="overflow-hidden">
+          <CardHeader className="pb-0">
             <CardTitle className="text-sm font-normal text-muted-foreground">cumulative P&L</CardTitle>
           </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <AreaChart data={pnlData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="pnlGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%"  stopColor={pnlColor} stopOpacity={0.15} />
-                    <stop offset="95%" stopColor={pnlColor} stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(240 5% 16%)" />
-                <XAxis dataKey="date" tick={{ fontSize: 10, fill: "hsl(240 5% 45%)" }} tickLine={false} axisLine={false} />
-                <YAxis tick={{ fontSize: 10, fill: "hsl(240 5% 45%)" }} tickLine={false} axisLine={false} tickFormatter={(v) => `$${v}`} />
-                <Tooltip
-                  contentStyle={{ background: "hsl(240 10% 8%)", border: "1px solid hsl(240 5% 20%)", borderRadius: 8, fontSize: 12 }}
-                  formatter={(v) => [`$${(v as number).toFixed(4)}`, "cumulative P&L"]}
-                />
-                <Area type="monotone" dataKey="pnl" stroke={pnlColor} fill="url(#pnlGrad)" strokeWidth={2} dot={false} />
-              </AreaChart>
-            </ResponsiveContainer>
+          <CardContent className="p-0">
+            <div style={{ height: 240 }}>
+              <Liveline
+                data={pnlPoints}
+                value={currentPnl}
+                color={pnlColor}
+                theme="dark"
+                fill
+                pulse
+                momentum
+                scrub
+                badge
+                badgeVariant="minimal"
+                showValue
+                valueMomentumColor
+                exaggerate
+                window={timeSpan}
+                formatValue={(v: number) => `$${v.toFixed(2)}`}
+              />
+            </div>
           </CardContent>
         </Card>
       )}
 
-      {/* portfolio value */}
-      {valueData.length > 0 && (
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-normal text-muted-foreground">portfolio value over time</CardTitle>
+      {/* portfolio value — liveline */}
+      {valuePoints.length > 0 && (
+        <Card className="overflow-hidden">
+          <CardHeader className="pb-0">
+            <CardTitle className="text-sm font-normal text-muted-foreground">portfolio value</CardTitle>
           </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={valueData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(240 5% 16%)" />
-                <XAxis dataKey="date" tick={{ fontSize: 10, fill: "hsl(240 5% 45%)" }} tickLine={false} axisLine={false} />
-                <YAxis tick={{ fontSize: 10, fill: "hsl(240 5% 45%)" }} tickLine={false} axisLine={false} tickFormatter={(v) => `$${v}`} />
-                <Tooltip
-                  contentStyle={{ background: "hsl(240 10% 8%)", border: "1px solid hsl(240 5% 20%)", borderRadius: 8, fontSize: 12 }}
-                  formatter={(v) => [`$${(v as number).toFixed(2)}`, "USDC balance"]}
-                />
-                <Line type="monotone" dataKey="value" stroke={ACCENT} strokeWidth={2} dot={false} />
-              </LineChart>
-            </ResponsiveContainer>
+          <CardContent className="p-0">
+            <div style={{ height: 240 }}>
+              <Liveline
+                data={valuePoints}
+                value={currentValue}
+                color={ACCENT}
+                theme="dark"
+                fill
+                scrub
+                badge
+                badgeVariant="minimal"
+                momentum={false}
+                window={timeSpan}
+                referenceLine={{ value: portfolio.startingBalanceUsd, label: "start" }}
+                formatValue={(v: number) => `$${v.toFixed(2)}`}
+              />
+            </div>
           </CardContent>
         </Card>
       )}

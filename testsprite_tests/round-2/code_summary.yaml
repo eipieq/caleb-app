@@ -1,0 +1,162 @@
+version: "2"
+type: frontend
+tech_stack:
+  - TypeScript
+  - Next.js 16 (App Router)
+  - shadcn/ui
+  - Tailwind CSS
+  - wagmi + viem (EVM contract interaction)
+  - "@initia/interwovenkit-react"
+  - "@tanstack/react-query"
+  - recharts
+  - liveline
+routes:
+  - path: /
+    file: app/page.tsx
+    auth_required: false
+    description: Trade feed home page showing all agent sessions, portfolio stats, agent status, and user balance
+  - path: /sessions/[id]
+    file: app/sessions/[id]/page.tsx
+    auth_required: false
+    description: Session detail page with full 5-step audit trail, on-chain verify, and attest functionality
+  - path: /strategy
+    file: app/strategy/page.tsx
+    auth_required: true
+    description: Per-wallet strategy configuration form (requires wallet connection)
+  - path: /analytics
+    file: app/analytics/page.tsx
+    auth_required: false
+    description: Analytics dashboard with cumulative P&L, portfolio value, verdict breakdown pie chart, and confidence distribution
+  - path: /api/verify/[id]
+    file: app/api/verify/[id]/route.ts
+    auth_required: false
+    description: Proxy API route to verify a session's on-chain hashes (avoids mixed-content)
+  - path: /api/attestations/[id]
+    file: app/api/attestations/[id]/route.ts
+    auth_required: false
+    description: Proxy API route to fetch attestations for a session (avoids mixed-content)
+features:
+  - name: Trade Feed
+    description: Live-updating feed of all agent trading sessions with verdict badges (BUY/SELL/SKIP), confidence scores, and timestamps. Polls every 10 seconds. Shows skeleton loading state. Caches to localStorage for instant revisits.
+    files:
+      - components/home-feed.tsx
+      - components/session-feed.tsx
+      - components/session-card.tsx
+      - components/stats-bar.tsx
+      - components/agent-status.tsx
+      - lib/api.ts
+    entry_route: /
+    user_interactions:
+      - View list of trading sessions with verdict, confidence, and timestamp
+      - See agent online/offline status indicator
+      - See stats bar with session counts
+      - Click a session card to navigate to session detail page
+    api_calls:
+      - method: GET
+        endpoint: /api/sessions?limit=50
+      - method: GET
+        endpoint: /api/portfolio
+  - name: Session Detail and Verification
+    description: Full 5-step audit timeline (POLICY, MARKET, DECISION, CHECK, EXECUTION) with on-chain transaction hashes. One-click verify re-hashes all step payloads and compares to on-chain hashes. Shows signal reasoning, confidence score, and strategy used.
+    files:
+      - components/session-detail.tsx
+      - app/sessions/[id]/page.tsx
+      - app/api/verify/[id]/route.ts
+      - lib/api.ts
+    entry_route: /sessions/[id]
+    user_interactions:
+      - View 5-step audit cycle with hash for each step
+      - Click "Verify on-chain" button to verify all hashes match
+      - See verification result badges (pass/fail per step)
+      - Copy transaction hashes to clipboard
+      - Expand raw session JSON data
+      - Click back button to return to feed
+    api_calls:
+      - method: GET
+        endpoint: /api/sessions/{id}
+      - method: GET
+        endpoint: /api/verify/{id}
+      - method: GET
+        endpoint: /api/attestations/{id}
+  - name: On-chain Attestation
+    description: After verifying a session, connected wallet users can attest on-chain by signing a transaction that calls attest(bytes32) on the DecisionLog smart contract. Shows attestation count and list of attester addresses.
+    files:
+      - components/session-detail.tsx
+      - lib/config.ts
+    entry_route: /sessions/[id]
+    user_interactions:
+      - Connect wallet (if not connected) via "Connect wallet to attest" button
+      - Click "Attest on-chain" button after successful verification
+      - See attestation transaction hash after confirming
+      - See "You attested this session" badge
+      - View list of all independent attestations with addresses and timestamps
+    api_calls:
+      - method: GET
+        endpoint: /api/attestations/{id}
+  - name: Strategy Configuration
+    description: Per-wallet trading strategy configuration. Users connect their Initia wallet, then configure strategy algorithm, max spend, confidence threshold, allowed tokens, max position size, and max drawdown. Settings are saved to the agent API by wallet address.
+    files:
+      - components/strategy-form.tsx
+      - app/strategy/page.tsx
+      - lib/api.ts
+    entry_route: /strategy
+    user_interactions:
+      - See "connect wallet" prompt if not connected
+      - Click connect wallet button
+      - Toggle agent active/paused switch
+      - Select strategy algorithm (momentum or mean-revert)
+      - Set max spend per trade (USD input)
+      - Adjust min signal strength slider (0 to 1)
+      - Toggle allowed tokens (INIT, ETH, USDC)
+      - Set max position size (USD input)
+      - Set max drawdown percentage
+      - Click "Save Strategy" button
+      - See "Saved" confirmation
+    api_calls:
+      - method: GET
+        endpoint: /api/policy/{address}
+      - method: POST
+        endpoint: /api/policy/{address}
+  - name: Analytics Dashboard
+    description: Portfolio analytics with stat cards (total P&L, portfolio value, win rate, trade count), cumulative P&L liveline chart, portfolio value liveline chart, verdict breakdown pie chart, and confidence distribution bar chart.
+    files:
+      - components/analytics-dashboard.tsx
+      - app/analytics/page.tsx
+      - lib/api.ts
+    entry_route: /analytics
+    user_interactions:
+      - View stat cards showing total P&L, portfolio value, win rate, and trade count
+      - Scrub over cumulative P&L chart to see values at different points
+      - Scrub over portfolio value chart
+      - View verdict breakdown pie chart (BUY/SELL/SKIP)
+      - View confidence distribution bar chart
+    api_calls:
+      - method: GET
+        endpoint: /api/portfolio
+      - method: GET
+        endpoint: /api/sessions?limit=200
+  - name: Wallet Connection and Balance
+    description: Global wallet connection via InterwovenKit. Shows live INIT balance on Initia testnet when connected. Connect button in navigation bar.
+    files:
+      - components/wallet-button.tsx
+      - components/user-balance-card.tsx
+      - components/connect-cta.tsx
+      - components/providers.tsx
+      - components/nav.tsx
+      - lib/config.ts
+    entry_route: /
+    user_interactions:
+      - Click Connect button in top navigation
+      - See wallet address displayed after connecting
+      - See live INIT balance card on home page
+    api_calls: []
+known_limitations:
+  - issue: API proxy routes (verify, attestations) forward to an HTTP VPS, which may be unavailable
+    location: app/api/verify/[id]/route.ts, app/api/attestations/[id]/route.ts
+    impact: Verification and attestation features fail if the VPS at 64.227.139.172 is down
+  - issue: Strategy page requires wallet connection, no guest/demo mode
+    location: components/strategy-form.tsx
+    impact: Users without an Initia wallet cannot view or interact with strategy configuration
+  - issue: Attestation requires a specific Initia chain (caleb-chain) which is a custom testnet
+    location: components/session-detail.tsx
+    impact: Users need to be on the correct custom chain to attest, which may not be in their wallet by default
