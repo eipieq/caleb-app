@@ -1,74 +1,94 @@
-# Caleb Dashboard
+# caleb
 
-The frontend for [Caleb](https://github.com/calebonchain/caleb-onchain) — a verifiable autonomous trading agent on Initia.
+an autonomous trading agent you don't have to trust. every trade is cryptographically committed on-chain and independently verifiable in one click.
 
-Live: **https://caleb-app.vercel.app**
-
----
-
-## What it does
-
-- **Trade Feed** — live stream of every agent decision with verdict, confidence score, and reasoning
-- **Session Detail** — full 5-step audit timeline (policy → market → decision → check → execution) with on-chain tx links
-- **One-click Verify** — re-hashes all step payloads and compares to on-chain hashes. Tamper-evident.
-- **Attest** — connect your Initia wallet and sign an on-chain transaction to record that you independently verified a session
-- **Strategy Config** — per-wallet policy settings (max spend, confidence threshold, cooldown, token whitelist)
-- **Live Balance** — your real INIT balance on Initia testnet, fetched from the Cosmos REST API
+submitted to **TestSprite Season 2** (deadline 2026-04-17).
+live at [app.caleb.sandpark.co](https://app.caleb.sandpark.co).
 
 ---
 
-## Stack
+## the 30-second pitch
 
-- Next.js 14 (App Router)
-- `@initia/interwovenkit-react` — Initia wallet connection
-- wagmi + viem — EVM contract reads/writes (attestation)
-- @tanstack/react-query — data fetching + polling
-- shadcn/ui + Tailwind CSS
+- **policy → market → decision → check → execution.** five keccak256 hashes, committed in order to caleb-chain (a dedicated minievm rollup on initia). the chain is the audit trail.
+- **dual attestation.** anyone can connect a wallet and attest a session on-chain. reputation comes from peer signatures, not self-claim.
+- **not a testnet toy.** the agent has been running hourly on a VPS since mar 2026, has placed 34 real trades against live ETH prices, and sits at +1.66% realized + unrealized on a $1000 paper account.
 
 ---
 
-## Running locally
+## project structure
+
+```
+caleb-app/
+├── app/                 next.js app router pages (/, /sessions/[id], /strategy, /analytics)
+├── components/          react components (session feed, portfolio card, verify flow, etc.)
+├── lib/                 api client, types, utils
+├── README.md            ← you are here
+├── PROGRESS.md          hackathon progress tracker
+└── testsprite_tests/
+    ├── testsprite-mcp-test-report.md   ← canonical combined report (R1 + R2)
+    ├── DELTA.md                        ← R1→R2 narrative analysis
+    ├── round-1/                        R1 artifacts — 0/15 passed (all blocked)
+    └── round-2/                        R2 artifacts — 5/15 passed (+33.3pp delta)
+```
+
+this is a next.js app — code lives in `app/`, `components/`, and `lib/` rather than `src/` (standard next.js app router convention).
+
+the agent backend and smart contract live in a sibling repo: [caleb-onchain](https://github.com/eipieq/caleb-onchain).
+
+---
+
+## the testsprite story
+
+**R1 found one bug and it dominated every test.**
+
+all 15 tests came back BLOCKED with "page rendered blank, 0 interactive elements." root cause: the dashboard was on `next dev`. wagmi + viem + interwovenkit + recharts + liveline is a heavy client bundle. hydration was taking 8-31 seconds in the dev-mode server logs. TestSprite's browser waits ~15 seconds and gives up.
+
+**R2 fixed that and surfaced real product bugs.**
+
+one line change: `next dev` → `next build && next start`. response time collapsed from seconds to 4ms. pass rate went 0% → 33.3%.
+
+the remaining failures were legitimate findings:
+- a misleading `ExternalLinkIcon` on an internal "proof" link in the trade history
+- "orphan" trades pointing to sessions that failed to commit on-chain (nonce race in the agent runner)
+
+both fixed after R2. see [testsprite_tests/DELTA.md](testsprite_tests/DELTA.md) for the full analysis.
+
+---
+
+## what makes caleb different
+
+- **dedicated rollup.** not logging to someone else's testnet. caleb has its own evm chain, its own contract, its own block explorer.
+- **5-step atomic cycle.** the audit is structured, not freeform. policy declares constraints before action. check ratifies action before execution. the chain enforces ordering.
+- **dual-path trust.** the agent commits hashes; users re-hash the payloads client-side and compare. attestation is the social layer on top.
+- **real execution, not a demo loop.** the agent has been running for weeks. portfolio is tracked from $1000 starting balance. pnl is real.
+
+---
+
+## run it yourself
 
 ```bash
 npm install
-npm run dev
+npm run build && npm run start
+# open http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
-
-**Environment variables** (optional — defaults point to the live VPS):
-
-```env
-NEXT_PUBLIC_AGENT_API=http://64.227.139.172:4000
-NEXT_PUBLIC_INDEXER_API=http://64.227.139.172:6767
-NEXT_PUBLIC_EVM_RPC=http://64.227.139.172:8545
-```
+defaults point to the live VPS at `64.227.139.172:4000`. no setup needed beyond install.
 
 ---
 
-## Pages
+## stack
 
-| Route | Description |
-|-------|-------------|
-| `/` | Trade feed — all sessions, portfolio stats, agent status |
-| `/sessions/[id]` | Session detail — full audit trail, verify, attest |
-| `/strategy` | Per-wallet strategy configuration |
-
----
-
-## Wallet Integration
-
-Connect via the **Connect** button (top right). Uses InterwovenKit — supports Initia-native wallets.
-
-Once connected:
-- Your live INIT balance is displayed (Cosmos L1, `initiation-2`)
-- Strategy settings are saved per wallet address
-- You can attest sessions on-chain (writes your address to `DecisionLog.sol`)
-
-The attestation contract is at `0x22679adc7475B922901137F22D120404c074044f` on `caleb-chain`.
+- next.js 16 (app router, turbopack)
+- `@initia/interwovenkit-react` — initia wallet connection
+- wagmi + viem — evm contract reads/writes (attestation)
+- recharts — portfolio charts
+- shadcn/ui + tailwind css
 
 ---
 
-## Deployment
+## links
 
-Auto-deploys to Vercel on push to `main`.
+- dashboard: [app.caleb.sandpark.co](https://app.caleb.sandpark.co)
+- agent + contract repo: [github.com/eipieq/caleb-onchain](https://github.com/eipieq/caleb-onchain)
+- contract: `0x22679adc7475B922901137F22D120404c074044f` on caleb-chain
+- agent wallet: `0x772a1f0c3e3856645FF9019Af5B077B08AA1AFa3`
