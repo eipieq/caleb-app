@@ -16,16 +16,21 @@ it's been running on a VPS since march 2026. 34 real trades. $1000 paper startin
 
 ---
 
-## what testsprite found
+## testing with testsprite
 
-**round 1: 0/15 passed.** every test blocked with "page rendered blank, 0 interactive elements." pretty embarrassing until you look at why: the dashboard was running `next dev`. the client bundle (wagmi + viem + interwovenkit + recharts + liveline) took 8-31 seconds to hydrate. testsprite's browser gives up after ~15s. one infrastructure bug, reported 15 times.
+we ran two rounds of automated testing using the testsprite MCP server. 15 test cases generated from a standardized PRD, covering the trade feed, session detail/verification flow, and wallet connection.
 
-**round 2: 5/15 passed.** one line fix: `next dev` → `next build && next start`. response time went from seconds to 4ms. that's roughly a 10,000x improvement from changing one command.
+**round 1** was basically a reality check. 0/15 passed. every single test reported a blank page with zero interactive elements. the app worked fine in a browser, so this was confusing at first. turns out we were serving the dashboard from `next dev`, and the client bundle (wagmi + viem + interwovenkit + recharts + liveline) was taking 8-31 seconds to hydrate. testsprite's headless browser waits about 15 seconds and moves on. one infrastructure problem, surfaced 15 times. we would not have caught this without automated testing since it only shows up under cold-start conditions in a headless environment.
 
-the remaining failures were genuinely useful:
-- testsprite clicked a "proof" link that had an `ExternalLinkIcon` on it, so it followed an explorer URL instead of the internal session page. real UX bug, not a test quirk. swapped to `ArrowRightIcon`.
-- some trades in the portfolio pointed to sessions that never committed on-chain (nonce race in the agent). clicking "proof" gave "session not found." added a `validSessionIds` filter so orphan trades show "no proof" with a tooltip instead of a broken link.
-- 3 tests need a browser wallet extension to complete. headless runners can't do that. environmental, not a product issue.
+**round 2** we switched to `next build && next start`. response time dropped from seconds to 4ms. pass rate jumped to 5/15 (33.3%), and now the failures were actually interesting.
+
+testsprite caught two real product bugs we'd missed:
+- a "proof" link in the trade history used an `ExternalLinkIcon` even though it pointed to an internal page. the test runner followed an external explorer link instead, which is exactly what a confused user would do too. swapped it for an `ArrowRightIcon`.
+- some portfolio trades referenced sessions that never committed on-chain (there was a nonce race between concurrent agent cycles). clicking "proof" on these gave "session not found" with no explanation. we added a `validSessionIds` filter so orphan trades now show "no proof" with a tooltip explaining why.
+
+3 of the remaining blocked tests need a browser wallet extension (metamask/rabby/etc) which headless runners don't have. not a product issue, just an environmental limit.
+
+the 0% to 33% jump from a single config change is honestly the most useful thing testsprite demonstrated here. it acts as a dev-mode detector, basically. if your app can't render in 15 seconds under a cold headless browser, you'll know immediately. and once it *can* render, the real bugs start showing up.
 
 full analysis in [testsprite_tests/DELTA.md](testsprite_tests/DELTA.md).
 
