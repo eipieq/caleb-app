@@ -43,7 +43,7 @@ export function HomeFeed() {
 
   useEffect(() => {
     const load = () => {
-      getSessions().then((s) => { setSessions(s); localStorage.setItem("caleb_sessions", JSON.stringify(s)); }).catch(() => setSessions([]));
+      getSessions(200).then((s) => { setSessions(s); localStorage.setItem("caleb_sessions", JSON.stringify(s)); }).catch(() => setSessions([]));
       getPortfolio().then((p) => { setPortfolio(p); localStorage.setItem("caleb_portfolio", JSON.stringify(p)); }).catch(() => setPortfolio(null));
     };
     load();

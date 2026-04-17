@@ -112,7 +112,7 @@ export function PortfolioCard({ portfolio, validSessionIds }: { portfolio: Portf
                         {fmt(t.pnlUsd)}
                       </span>
                     )}
-                    {t.sessionId && t.sessionId !== "pending" ? (
+                    {t.sessionId && t.sessionId !== "pending" && validSessionIds?.has(t.sessionId) ? (
                       <Link
                         href={`/sessions/${t.sessionId}`}
                         className="text-muted-foreground/50 hover:text-muted-foreground transition-colors flex items-center gap-0.5"
