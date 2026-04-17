@@ -1,0 +1,140 @@
+version: "2"
+type: frontend
+tech_stack:
+  - typescript
+  - next.js 16 (app router, turbopack)
+  - shadcn/ui + tailwind css
+  - wagmi + viem (evm contract interaction)
+  - "@initia/interwovenkit-react"
+  - recharts (portfolio charts)
+  - lucide-react (icons)
+routes:
+  - path: /
+    file: app/page.tsx
+    auth_required: false
+    description: home feed showing live trade sessions, agent status, portfolio summary, connect wallet CTA
+  - path: /sessions/[id]
+    file: app/sessions/[id]/page.tsx
+    auth_required: false
+    description: session detail with 5-step audit timeline, on-chain verification, attestations list
+  - path: /strategy
+    file: app/strategy/page.tsx
+    auth_required: false
+    description: per-wallet strategy configuration (max spend, confidence threshold, cooldown, token whitelist)
+  - path: /analytics
+    file: app/analytics/page.tsx
+    auth_required: false
+    description: portfolio analytics with P&L charts, verdict/confidence distributions
+  - path: /api/verify/[id]
+    file: app/api/verify/[id]/route.ts
+    auth_required: false
+    description: server-side verification endpoint that re-hashes step payloads and compares to on-chain hashes
+  - path: /api/attestations/[id]
+    file: app/api/attestations/[id]/route.ts
+    auth_required: false
+    description: fetches attestation records for a session from the DecisionLog contract
+features:
+  - name: Trade Feed
+    description: live feed of agent trading sessions with status badges, confidence scores, and session navigation
+    files:
+      - components/home-feed.tsx
+      - components/session-feed.tsx
+      - components/stats-bar.tsx
+      - components/agent-status.tsx
+    entry_route: /
+    user_interactions:
+      - View live feed of trading sessions with verdict and confidence
+      - See agent online/offline status with time since last session
+      - See stats bar with total sessions, trades, win rate
+      - Click a session card to navigate to session detail
+      - Feed auto-refreshes every 10 seconds via polling
+    api_calls:
+      - method: GET
+        endpoint: http://64.227.139.172:4000/sessions
+    auth_required: false
+  - name: Portfolio Summary
+    description: portfolio card showing starting balance, total P&L, realised/unrealised split, open positions, and trade history with proof links
+    files:
+      - components/portfolio-card.tsx
+      - components/home-feed.tsx
+    entry_route: /
+    user_interactions:
+      - View total portfolio value and P&L percentage
+      - View realised vs unrealised P&L breakdown
+      - View open positions with entry price and current value
+      - View trade history with BUY/SELL badges and timestamps
+      - Click "proof" link on a trade to navigate to the session detail
+      - See "no proof" label on orphan trades that failed to commit on-chain
+    api_calls:
+      - method: GET
+        endpoint: http://64.227.139.172:4000/portfolio
+    auth_required: false
+  - name: Session Detail and Verification
+    description: full 5-step audit timeline for a session with on-chain hash verification and raw JSON inspection
+    files:
+      - app/sessions/[id]/page.tsx
+      - components/session-detail.tsx
+      - components/verify-button.tsx
+      - components/step-timeline.tsx
+    entry_route: /sessions/[id]
+    user_interactions:
+      - View 5-step audit timeline (policy, market, decision, check, execution)
+      - Expand/collapse individual steps to see reasoning and raw JSON
+      - Click verify button to re-hash payloads and compare to on-chain hashes
+      - See per-step verification badges (match/mismatch)
+      - Copy a step hash to clipboard
+      - Navigate back to feed
+    api_calls:
+      - method: GET
+        endpoint: http://64.227.139.172:4000/sessions/{id}
+      - method: GET
+        endpoint: /api/verify/{id}
+    auth_required: false
+  - name: Attestation
+    description: connect wallet and sign an on-chain attestation for a verified session
+    files:
+      - components/session-attestations.tsx
+      - components/attest-button.tsx
+    entry_route: /sessions/[id]
+    user_interactions:
+      - View list of wallet addresses that have attested this session
+      - Click attest button to sign an on-chain transaction
+      - See attestation count update after signing
+    api_calls:
+      - method: GET
+        endpoint: /api/attestations/{id}
+    auth_required: true
+  - name: Wallet Connection
+    description: connect an Initia-compatible wallet via InterwovenKit to enable attestation and see INIT balance
+    files:
+      - components/connect-cta.tsx
+      - components/user-balance-card.tsx
+      - components/wallet-provider.tsx
+    entry_route: /
+    user_interactions:
+      - Click "connect wallet" button in header or home CTA
+      - Select wallet from modal (MetaMask, Rabby, Phantom, Keplr, Leap)
+      - See connected address in header after connection
+      - View INIT balance on home page
+      - Disconnect wallet to return to guest state
+    api_calls: []
+    auth_required: false
+  - name: Strategy Configuration
+    description: per-wallet trading policy settings
+    files:
+      - app/strategy/page.tsx
+    entry_route: /strategy
+    user_interactions:
+      - View current strategy parameters
+      - Modify max spend, confidence threshold, cooldown, token whitelist
+    api_calls:
+      - method: GET
+        endpoint: http://64.227.139.172:4000/policy
+    auth_required: true
+known_limitations:
+  - issue: Wallet connection requires a browser extension (MetaMask/Rabby/etc). Headless test runners cannot complete the connect flow.
+    location: components/wallet-provider.tsx
+    impact: TC008, TC013, TC014 will always be blocked in headless environments
+  - issue: Strategy page requires connected wallet to load user-specific settings
+    location: app/strategy/page.tsx
+    impact: Strategy features untestable without wallet extension

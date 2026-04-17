@@ -16,23 +16,35 @@ it's been running on a VPS since march 2026. 34 real trades. $1000 paper startin
 
 ---
 
+## why this needed automated testing
+
+caleb isn't a simple CRUD app. it's a next.js frontend talking to a live trading agent over REST, rendering real-time portfolio data, fetching on-chain hashes from a custom EVM rollup, and handling wallet connections across five different providers via interwovenkit. the client bundle pulls in wagmi, viem, recharts, and liveline on top of that. there are async data flows everywhere: polling sessions every 10 seconds, lazy-loading session detail from the agent API, client-side hash verification against on-chain state, and wallet-gated attestation transactions.
+
+manually testing all of that is slow and you inevitably miss the edges. the proof links in the trade history looked fine when you clicked the right ones. the orphan sessions only broke if you happened to click a trade whose session failed to commit. you don't catch that stuff by clicking around.
+
 ## testing with testsprite
 
-we used the testsprite MCP server to generate and run 15 automated test cases from a standardized PRD. covers the trade feed, session detail/verification flow, and wallet connection.
+we used testsprite's MCP server to generate automated test cases from a standardized PRD and run them against the app in a headless browser. ran three rounds total.
 
-our first attempt didn't produce usable results. we were serving the app from `next dev`, and the client bundle (wagmi + viem + interwovenkit + recharts + liveline) took 8-31 seconds to hydrate. testsprite's headless browser times out after about 15 seconds, so every test reported a blank page. not a real test failure, just broken setup. we switched to `next build && next start` and ran again.
+**round 1** didn't produce usable results. we were serving from `next dev` and the heavy client bundle took 8-31 seconds to hydrate. testsprite's browser times out after ~15s, so every test saw a blank page. not a real failure, just broken setup. switched to `next build && next start`.
 
-**results: 5/15 passed, 3 failed, 7 blocked.**
+**round 2 (15 tests): 5 passed, 3 failed, 7 blocked.**
 
-testsprite caught two real bugs we hadn't noticed:
-- a "proof" link in the trade history used an `ExternalLinkIcon` even though it pointed to an internal page. the test runner followed an external explorer link instead, which is exactly what a confused user would do too. swapped it for an `ArrowRightIcon`.
-- some portfolio trades referenced sessions that never committed on-chain (nonce race between concurrent agent cycles). clicking "proof" on these gave "session not found" with no explanation. we added a `validSessionIds` filter so orphan trades now show "no proof" with a tooltip explaining why.
+testsprite caught two bugs we'd missed:
+- a "proof" link in trade history used `ExternalLinkIcon` even though it was an internal route. the runner followed an explorer link instead, exactly what a confused user would do. swapped to `ArrowRightIcon`.
+- some trades referenced sessions that never committed on-chain (nonce race in the agent). clicking "proof" gave "session not found" with no context. added a `validSessionIds` filter so orphan trades show "no proof" with a tooltip.
 
-both fixed after testing. 3 of the blocked tests need a browser wallet extension (metamask/rabby) which headless runners don't have, so those are environmental limits, not product bugs. the remaining blocks were downstream of the orphan session ID issue.
+**round 3 (26 tests, post-fix): 16 passed, 3 failed, 7 blocked.**
 
-testsprite was genuinely useful here. we'd been using the app in a browser for weeks and never noticed either bug. the icon thing is subtle, and the orphan trades only show up if you happen to click the right row. having an automated runner systematically click through every link surfaced edge cases we would've shipped with.
+ran again after fixing both bugs. testsprite confirmed the fixes work: TC005 (proof link navigation) now passes, and TC025 specifically tests that orphan trades show the "no proof" label. both green.
 
-full analysis in [testsprite_tests/DELTA.md](testsprite_tests/DELTA.md).
+the new failures are interesting too. the verdict distribution chart shows a single "SKIP" slice because the agent skips ~83% of its cycles. technically correct data but visually looks broken. the confidence histogram has the same problem: one fat bar. these are data-skew UX issues, not rendering bugs.
+
+the blocked tests mostly hit orphan session IDs where the runner navigated to a session that didn't commit on-chain. a few need a browser wallet extension that headless runners can't provide.
+
+testsprite was genuinely useful here. we'd been using this app in a browser for weeks and never noticed either bug it found. the icon thing is subtle. the orphan trades only break if you click the wrong row. having a runner systematically click through every link and every flow surfaces the stuff you'd ship with otherwise.
+
+full analysis in [testsprite_tests/DELTA.md](testsprite_tests/DELTA.md). per-round reports in `testsprite_tests/round-*/`.
 
 ---
 
@@ -52,10 +64,11 @@ caleb-app/
 ├── components/          session feed, portfolio card, verify flow, attestation UI
 ├── lib/                 api client, types, utils
 └── testsprite_tests/
-    ├── testsprite-mcp-test-report.md   combined R1 + R2 report
+    ├── testsprite-mcp-test-report.md   canonical combined report
     ├── DELTA.md                        R1→R2 analysis
-    ├── round-1/                        0/15 passed (all blocked)
-    └── round-2/                        5/15 passed
+    ├── round-1/                        0/15 passed (broken setup)
+    ├── round-2/                        5/15 passed (first real run)
+    └── round-3/                        16/26 passed (post-fix)
 ```
 
 next.js app router convention, so code lives in `app/`, `components/`, `lib/` instead of `src/`.

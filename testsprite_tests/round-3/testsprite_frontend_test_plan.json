@@ -1,0 +1,736 @@
+[
+  {
+    "id": "TC001",
+    "title": "View live trading dashboard status, stats, and sessions list",
+    "description": "Verifies the home dashboard renders agent status, stats bar, and a list of trading sessions for browsing.",
+    "category": "Trade Feed",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the home dashboard content to load"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the agent status is displayed with an online/offline indicator and a time since last session"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the stats bar is displayed with session and performance summary metrics"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a list of session cards is displayed in the feed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC002",
+    "title": "View live sessions feed with agent status, stats, and portfolio summary",
+    "description": "Verifies a guest can open the home dashboard and see agent status, a stats summary, a live trade feed, and a portfolio summary rendered together.",
+    "category": "Wallet Connection",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the agent status and time since last session are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the stats summary bar is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a list of recent sessions is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the portfolio summary section is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC003",
+    "title": "View portfolio summary and trade history on the dashboard",
+    "description": "Verifies the portfolio summary card renders overall value/P&L information and trade history entries.",
+    "category": "Portfolio Summary",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the portfolio summary section to load"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the portfolio summary displays total value and P&L information"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify recent trade history entries are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC004",
+    "title": "Trade feed auto-refresh updates sessions without breaking page state",
+    "description": "Verifies the home trade feed automatically refreshes and updates session content after the polling interval without disrupting browsing.",
+    "category": "Wallet Connection",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the sessions feed to finish initial loading"
+      },
+      {
+        "type": "action",
+        "description": "Scroll down within the sessions feed"
+      },
+      {
+        "type": "action",
+        "description": "Wait for 12 seconds"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the sessions feed is still displayed and populated"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user remains on the home dashboard with the feed still usable"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC005",
+    "title": "Navigate from a trade proof link to the related session detail",
+    "description": "Verifies clicking a trade history proof link opens the corresponding session detail for investigation.",
+    "category": "Portfolio Summary",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the portfolio trade history to load"
+      },
+      {
+        "type": "action",
+        "description": "Click a trade's proof link"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the session detail view is displayed with the audit timeline"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC006",
+    "title": "Auto-refresh feed updates sessions without losing browsing context",
+    "description": "Verifies the trade feed auto-refreshes on a timer and continues to function while the user is browsing the list.",
+    "category": "Trade Feed",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the session feed to load"
+      },
+      {
+        "type": "action",
+        "description": "Scroll down within the sessions feed to a mid-page position"
+      },
+      {
+        "type": "action",
+        "description": "Wait for at least 12 seconds"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify session cards are still displayed and the feed remains usable at the current scroll position"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC007",
+    "title": "Open a session from the home feed and view audit timeline",
+    "description": "Verifies a guest can open a session from the home feed and see the 5-step audit timeline on the session detail page.",
+    "category": "Wallet Connection",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click a session card to open its detail view"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the session detail view is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the 5-step audit timeline is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC008",
+    "title": "Run on-chain verification and show per-step verification badges",
+    "description": "Verifies running verification computes and compares hashes and displays per-step match/mismatch badges.",
+    "category": "Session Detail and Verification",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the session feed to load"
+      },
+      {
+        "type": "action",
+        "description": "Click a session card to open its details"
+      },
+      {
+        "type": "action",
+        "description": "Run session verification"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify verification results are displayed with per-step match/mismatch badges"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC009",
+    "title": "Open a session detail from a session card",
+    "description": "Verifies selecting a session from the feed navigates to the session detail page and renders the audit timeline.",
+    "category": "Trade Feed",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the session feed to load"
+      },
+      {
+        "type": "action",
+        "description": "Click a session card to open its details"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the session detail view shows the 5-step audit timeline"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC010",
+    "title": "View portfolio analytics overview",
+    "description": "User can open the analytics dashboard and see key performance stat cards plus multiple charts rendered for investigating agent performance.",
+    "category": "Analytics Dashboard",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /analytics"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the analytics content to finish loading"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify summary stat cards for portfolio performance are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify at least one analytics chart is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC011",
+    "title": "Inspect audit timeline by expanding a step to view reasoning and raw JSON",
+    "description": "Verifies a user can expand an audit step and inspect both human-readable reasoning and the raw JSON payload.",
+    "category": "Session Detail and Verification",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the session feed to load"
+      },
+      {
+        "type": "action",
+        "description": "Click a session card to open its details"
+      },
+      {
+        "type": "action",
+        "description": "Expand one audit step in the timeline"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the expanded step displays reasoning content and raw JSON details"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC012",
+    "title": "Inspect audit steps by expanding each step to view reasoning and raw JSON",
+    "description": "Verifies a guest can expand audit timeline steps on a session detail page to view step reasoning and raw JSON payloads.",
+    "category": "Wallet Connection",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click a session card to open its detail view"
+      },
+      {
+        "type": "action",
+        "description": "Expand the POLICY step"
+      },
+      {
+        "type": "action",
+        "description": "Expand the MARKET step"
+      },
+      {
+        "type": "action",
+        "description": "Expand the DECISION step"
+      },
+      {
+        "type": "action",
+        "description": "Expand the CHECK step"
+      },
+      {
+        "type": "action",
+        "description": "Expand the EXECUTION step"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify expanded steps show human-readable reasoning content"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify expanded steps show a raw JSON payload section"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC013",
+    "title": "Return from session detail back to the feed",
+    "description": "Verifies the user can navigate back from session detail to the home feed and continue browsing sessions.",
+    "category": "Session Detail and Verification",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the session feed to load"
+      },
+      {
+        "type": "action",
+        "description": "Click a session card to open its details"
+      },
+      {
+        "type": "action",
+        "description": "Use the in-app navigation to return to the feed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the home feed is displayed with session cards available for browsing"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC014",
+    "title": "Return from session detail back to home feed and continue browsing",
+    "description": "Verifies a guest can navigate back from a session detail view to the home feed and continue viewing sessions and portfolio info.",
+    "category": "Wallet Connection",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click a session card to open its detail view"
+      },
+      {
+        "type": "action",
+        "description": "Use the in-app navigation to return to the sessions feed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the sessions feed is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the portfolio summary section is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC015",
+    "title": "Browse archived sessions and open a legacy session",
+    "description": "Verifies the user can reveal archived sessions and open a session from the feed into its detail view.",
+    "category": "Trade Feed",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the session feed to load"
+      },
+      {
+        "type": "action",
+        "description": "Toggle the archive control to reveal legacy sessions"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to a session card in the feed"
+      },
+      {
+        "type": "action",
+        "description": "Click the session card to open its details"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the session detail view is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC016",
+    "title": "Inspect cumulative P&L chart",
+    "description": "User can view a cumulative P&L chart on the analytics dashboard to understand performance over time.",
+    "category": "Analytics Dashboard",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /analytics"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the P&L chart section"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a cumulative P&L chart is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the chart contains plotted data points or segments"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC017",
+    "title": "Attempt to attest without a connected wallet shows connect prompt",
+    "description": "Verifies a guest attempting to attest a session is prompted to connect a wallet before attesting.",
+    "category": "Attestation",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click a session card to open its detail view"
+      },
+      {
+        "type": "action",
+        "description": "Click the attest control"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a prompt to connect a wallet is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the session is not shown as newly attested by the current user"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC018",
+    "title": "Inspect portfolio value chart",
+    "description": "User can view a portfolio value chart on the analytics dashboard to understand portfolio value trends over time.",
+    "category": "Analytics Dashboard",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /analytics"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the portfolio value chart section"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a portfolio value chart is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the chart contains plotted data points or segments"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC019",
+    "title": "Copy a step hash from the audit timeline",
+    "description": "Verifies a user can copy an audit step hash and receives a visible confirmation that the copy action occurred.",
+    "category": "Session Detail and Verification",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the session feed to load"
+      },
+      {
+        "type": "action",
+        "description": "Click a session card to open its details"
+      },
+      {
+        "type": "action",
+        "description": "Expand one audit step in the timeline"
+      },
+      {
+        "type": "action",
+        "description": "Click the control to copy the step hash"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a copy-to-clipboard confirmation is visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC020",
+    "title": "Open Strategy page as guest shows connect prompt and blocks editing",
+    "description": "Verifies a guest can visit the strategy configuration page and is prompted to connect a wallet before editing policy settings.",
+    "category": "Strategy Configuration",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /strategy"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a wallet connection prompt is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify strategy editing controls are not available until a wallet is connected"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC021",
+    "title": "View verdict distribution breakdown",
+    "description": "User can view the verdict distribution visualization to understand how often each decision outcome occurs.",
+    "category": "Analytics Dashboard",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /analytics"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the verdict distribution section"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a verdict distribution chart is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the distribution includes multiple categories or slices"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC022",
+    "title": "View attestations section on session detail",
+    "description": "Verifies a guest can view the attestations section on a session detail page and see either a populated list or an empty state.",
+    "category": "Attestation",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click a session card to open its detail view"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the attestations section"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an attestation count is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify either an attester list is displayed or an empty state is shown"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC023",
+    "title": "View confidence histogram",
+    "description": "User can view the confidence histogram to understand how agent confidence values are distributed across decisions.",
+    "category": "Analytics Dashboard",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /analytics"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the confidence section"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a confidence histogram chart is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the histogram contains multiple bins or bars"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC024",
+    "title": "Analytics page remains usable after scrolling through all sections",
+    "description": "User can scroll through all analytics sections and the page remains interactive with charts still visible in their sections.",
+    "category": "Analytics Dashboard",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /analytics"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the bottom of the analytics page"
+      },
+      {
+        "type": "action",
+        "description": "Scroll back to the top of the analytics page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify summary stat cards are still displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify at least one analytics chart is still displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC025",
+    "title": "Display orphan trades with no proof label when present",
+    "description": "Verifies trades without an associated proof are clearly marked as having no proof when such trades appear in history.",
+    "category": "Portfolio Summary",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the portfolio trade history to load"
+      },
+      {
+        "type": "action",
+        "description": "Scroll through the trade history entries"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify any trade without a proof link is shown with an indicator that no proof is available"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC026",
+    "title": "Cancel wallet connect modal and remain in guest state",
+    "description": "Verifies a guest can open the wallet connect modal and cancel it, remaining unconnected with guest UI state.",
+    "category": "Wallet Connection",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the connect wallet call-to-action"
+      },
+      {
+        "type": "action",
+        "description": "Close the wallet selection modal"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the header still shows a connect wallet call-to-action"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify no connected wallet address is displayed"
+      }
+    ],
+    "priority": "Low"
+  }
+]

@@ -1209,7 +1209,7 @@ body {
         <div class="metadata-container">
         <div class="metadata-row">
           <div class="metadata-label text-body-medium">Project Name</div>
-          <div class="metadata-value text-body">caleb — an autonomous trading agent with on-chain audit trails</div>
+          <div class="metadata-value text-body">N/A</div>
         </div>
         <div class="metadata-row">
           <div class="metadata-label text-body-medium">Date</div>
@@ -1237,49 +1237,7 @@ body {
             <li><span class="coverage-highlight">0/0</span> of tests passed</li>
             <li><span class="coverage-highlight">Key gaps / risks:</span>
             
-              <ol>
-<li>
-<p><strong>Orphan session IDs in tradeHistory (fixed post-R2).</strong> 4 of 7 non-passing tests trace back to <code>portfolio.tradeHistory</code> containing <code>sessionId</code> values for sessions that failed to commit on-chain. Root cause: nonce race between concurrent agent cycles in <code>onchain/runner.js</code>. UI mitigation (filtering proof links through a <code>validSessionIds</code> Set in <code>components/home-feed.tsx:81</code>) shipped after R2. Structural fix in the agent is a follow-up.</p>
-</li>
-<li>
-<p><strong>Misleading <code>ExternalLinkIcon</code> on internal link (fixed mid-R2).</strong> <code>components/portfolio-card.tsx</code> previously used <code>ExternalLinkIcon</code> for a Next.js <code>&lt;Link&gt;</code> to <code>/sessions/[id]</code>. The test runner took it at face value and followed an unrelated Initia explorer link instead. Swapped to <code>ArrowRightIcon</code>. Real UX bug, not just a test-runner quirk.</p>
-</li>
-<li>
-<p><strong>Headless wallet fixture missing.</strong> TC008/013/014 block because InterwovenKit requires an EIP-1193 provider. Out of scope for this submission; the test runner still verifies the modal opens, lists wallets correctly, and the connect button is global. Follow-up: ship a <code>MockWalletProvider</code> behind a <code>NEXT_PUBLIC_TEST_MODE</code> flag.</p>
-</li>
-<li>
-<p><strong>TC005 code-generation anomaly.</strong> MCP did not emit a <code>TC005_*.py</code> test script. Appears to be a TestSprite pipeline issue, not a caleb-app issue. Worth re-requesting in a future round.</p>
-</li>
-<li>
-<p><strong>Production-build speed regression risk.</strong> The entire R1 → R2 delta came from switching <code>next dev</code> → <code>next build &amp;&amp; next start</code>. Any future change that silently lands us back on a slow server (misconfigured <code>pm2</code>, Docker running <code>dev</code> by default, etc.) will reintroduce the hydration-timeout cliff. Mitigation: add a smoke test that asserts TTFB &lt; 500ms before running the suite.</p>
-</li>
-</ol>
-<hr>
-<h2>6️⃣ What TestSprite proved about caleb</h2>
-<ul>
-<li><strong>The 5-step audit architecture works end-to-end.</strong> The feed, detail, verify and attestation components all render and integrate with the live agent API.</li>
-<li><strong>Real bugs surfaced.</strong> Two shipped fixes (<code>ExternalLinkIcon</code>, orphan-session filtering) came directly from TestSprite observations, plus a structural follow-up identified (nonce serialization).</li>
-<li><strong>The pass rate is a ceiling, not a floor.</strong> 7 of 10 non-passing tests are either environmental (headless wallet: 3) or cascading from a single fixed bug (orphan IDs: 4). Effective product health is closer to ~80% than 33%.</li>
-</ul>
-<hr>
-<h2>7️⃣ Artifacts</h2>
-<pre><code>testsprite_tests/
-├── testsprite-mcp-test-report.md   ← you are here (combined)
-├── DELTA.md                        ← R1 → R2 narrative analysis
-├── round-1/
-│   ├── testsprite-mcp-test-report.md    ← R1 canonical report
-│   ├── standard_prd.json
-│   ├── testsprite_frontend_test_plan.json
-│   └── TC001…TC015_*.py                 ← 15 generated test scripts
-└── round-2/
-    ├── testsprite-mcp-test-report.md    ← R2 canonical report
-    ├── standard_prd.json
-    ├── testsprite_frontend_test_plan.json
-    ├── code_summary.yaml
-    ├── test_results.json
-    └── TC001…TC015_*.py                 ← 15 generated test scripts
-</code></pre>
-
+              N/A
             </li>
 </ul>
         </div>
@@ -1335,7 +1293,7 @@ body {
         </div>
         <div class="metadata-row">
           <div class="metadata-label text-body-medium">Code Repo</div>
-          <div class="metadata-value text-body">caleb — an autonomous trading agent with on-chain audit trails</div>
+          <div class="metadata-value text-body">N/A</div>
         </div>
         <div class="metadata-row">
           <div class="metadata-label text-body-medium">Test Results</div>
