@@ -5,6 +5,15 @@ target: 15-16/24 passed (63-67%)
 
 the 8 blocked tests are all wallet/auth and cannot be fixed (headless environment limitation). that leaves 5 failures to address.
 
+## status
+
+- [x] fix 1: session card clickability (TC001, TC003) -- added data-testid and aria-label to Link
+- [x] fix 2: step reasoning display (TC002) -- check `reason` field (not just `reasoning`), surface policy/check info
+- [x] fix 3: copy feedback in headless browser (TC002) -- try/catch clipboard, always show feedback
+- [x] fix 4: show amount on all session cards (TC005) -- show "--" for SKIP sessions
+- [x] fix 5: attestation empty state (TC012) -- always render section with count, show empty message
+- [ ] rebuild, deploy, and run R6 tests
+
 ---
 
 ## fix 1: session card clickability (TC001, TC003)

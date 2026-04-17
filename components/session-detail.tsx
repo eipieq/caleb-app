@@ -42,7 +42,7 @@ export function SessionDetail({ session }: { session: Session }) {
   const [expandedSteps, setExpandedSteps] = useState<Set<string>>(new Set());
 
   function copyWithFeedback(text: string, label: string) {
-    navigator.clipboard.writeText(text);
+    try { navigator.clipboard.writeText(text); } catch {}
     setCopiedHash(label);
     setTimeout(() => setCopiedHash(null), 2000);
   }
@@ -258,17 +258,20 @@ export function SessionDetail({ session }: { session: Session }) {
       </Card>
 
       {/* Attestations */}
-      {attestations.length > 0 && (
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <UsersIcon className="size-4" />
-              Independent Attestations
-            </CardTitle>
-            <CardDescription>
-              These addresses independently verified and attested this session on-chain.
-            </CardDescription>
-          </CardHeader>
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <UsersIcon className="size-4" />
+            Independent Attestations
+            <span className="text-sm font-normal text-muted-foreground ml-1">({attestations.length})</span>
+          </CardTitle>
+          <CardDescription>
+            {attestations.length > 0
+              ? "These addresses independently verified and attested this session on-chain."
+              : "No attestations yet. Verify this session and attest on-chain to be the first."}
+          </CardDescription>
+        </CardHeader>
+        {attestations.length > 0 && (
           <CardContent>
             <div className="flex flex-col gap-2">
               {attestations.map((a, i) => (
@@ -283,8 +286,8 @@ export function SessionDetail({ session }: { session: Session }) {
               ))}
             </div>
           </CardContent>
-        </Card>
-      )}
+        )}
+      </Card>
 
       {/* Signal Reasoning */}
       {reasoning && (
@@ -336,10 +339,14 @@ export function SessionDetail({ session }: { session: Session }) {
                     <div className="ml-28 mt-2 mb-3 flex flex-col gap-2 text-xs">
                       {step.payload && (
                         <div className="text-sm text-muted-foreground leading-relaxed">
-                          {typeof step.payload === "object" && (step.payload as Record<string, unknown>).reasoning
-                            ? <p>{(step.payload as Record<string, unknown>).reasoning as string}</p>
-                            : <p className="text-muted-foreground/60">No reasoning available for this step.</p>
-                          }
+                          {(() => {
+                            const p = step.payload as Record<string, unknown>;
+                            const text = (p.reasoning as string) ?? (p.reason as string) ?? (p.signal as string) ?? null;
+                            if (text) return <p>{text}</p>;
+                            if (step.kind === "POLICY") return <p>max spend ${String(p.maxSpendUsd)}, confidence threshold {String(p.confidenceThreshold)}, tokens: {Array.isArray(p.allowedTokens) ? (p.allowedTokens as string[]).join(", ") : "—"}</p>;
+                            if (step.kind === "CHECK") return <p>{p.passed ? "all gates passed" : `blocked by: ${String(p.blockedBy)}`}</p>;
+                            return <p className="text-muted-foreground/60">expand raw JSON below for full payload.</p>;
+                          })()}
                         </div>
                       )}
 

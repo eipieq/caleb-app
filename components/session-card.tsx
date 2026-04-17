@@ -32,7 +32,7 @@ export function SessionCard({ session }: { session: Session }) {
   const date = new Date(session.startedAt * 1000);
 
   return (
-    <Link href={`/sessions/${session.sessionId}`} className="group">
+    <Link href={`/sessions/${session.sessionId}`} className="group" data-testid="session-card" aria-label={`${verdict} session ${session.sessionId.slice(0, 10)}`}>
       <Card size="sm" className="flex-row items-center justify-between gap-4 px-4 py-3 hover:bg-accent/50 transition-colors">
         <div className="flex items-center gap-3 min-w-0">
           <Badge variant={verdictVariant(verdict)}>
@@ -53,12 +53,12 @@ export function SessionCard({ session }: { session: Session }) {
         </div>
 
         <div className="flex items-center gap-6 shrink-0">
-          {isActive && amountUsd > 0 && (
-            <div className="text-right hidden md:block">
-              <div className="text-xs text-muted-foreground">amount</div>
-              <div className="text-sm font-mono font-medium">${amountUsd.toFixed(2)}</div>
+          <div className="text-right hidden md:block">
+            <div className="text-xs text-muted-foreground">amount</div>
+            <div className="text-sm font-mono font-medium">
+              {isActive && amountUsd > 0 ? `$${amountUsd.toFixed(2)}` : "--"}
             </div>
-          )}
+          </div>
           <div className="text-right hidden md:block">
             <div className="text-xs text-muted-foreground">signal</div>
             <div className={cn("text-sm font-mono font-medium", confidence >= 0.5 ? "text-foreground" : "text-muted-foreground")}>
