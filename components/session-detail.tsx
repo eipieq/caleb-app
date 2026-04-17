@@ -89,6 +89,9 @@ export function SessionDetail({ session }: { session: Session }) {
     setAttesting(true);
     setAttestError(null);
     try {
+      const sender = address || hexAddress;
+      if (!sender) { setAttestError("Wallet address not available — reconnect your wallet"); return; }
+
       // encode the attest(bytes32) call using viem
       const input = encodeFunctionData({
         abi: DECISION_LOG_ABI,
@@ -98,7 +101,7 @@ export function SessionDetail({ session }: { session: Session }) {
 
       // explicitly protobuf-encode the message so the registry doesn't need to know the type
       const msgValue = MsgCall.encode(MsgCall.fromPartial({
-        sender: address,
+        sender,
         contractAddr: CONTRACT_ADDRESS,
         input,
         value: "",
